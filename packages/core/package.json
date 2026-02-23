@@ -1,15 +1,22 @@
 {
-  "name": "@hrt-tracker/core",
+  "name": "@estrogen-pk/core",
   "version": "1.0.0",
-  "description": "Core utilities and constants",
+  "description": "Production-grade TypeScript core library for estradiol pharmacokinetic modeling.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "estradiol",
+    "pharmacokinetics",
+    "pk-model",
+    "one-compartment"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
 }
