@@ -5,7 +5,7 @@
   "sourceRoot": "packages/workers/backend/src",
   "targets": {
     "build": {
-      "command": "pnpm --filter @hrt-tracker/backend build"
+      "command": "pnpm --filter @hrt-tracker/backend build && mkdir -p ./build/server && cp -r packages/workers/backend/dist/* ./build/server/"
     },
     "dev": {
       "command": "pnpm --filter @hrt-tracker/backend dev"

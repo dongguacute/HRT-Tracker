@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nx run-many --target=dev --all --parallel=2",
-    "build": "nx run-many --target=build --all --parallel=2",
+    "dev": "nx run-many --target=dev --all --parallel=3",
+    "build": "nx run-many --target=build --all --parallel=3",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -1,14 +1,18 @@
-import { cloudflare } from '@cloudflare/vite-plugin'
 import { defineConfig } from 'vite'
-import ssrPlugin from 'vite-ssr-components/plugin'
+import devServer from '@hono/vite-dev-server'
 
 export default defineConfig({
-  plugins: [cloudflare(), ssrPlugin()],
+  plugins: [
+    devServer({
+      entry: 'src/index.tsx'
+    })
+  ],
   build: {
-    outDir: "../../../build/server",
-    emptyOutDir: true,
-    rollupOptions: {
-      input: "./src/index.tsx",
-    },
-  },
+    ssr: true,
+    lib: {
+      entry: 'src/index.tsx',
+      formats: ['es'],
+      fileName: 'index'
+    }
+  }
 })
