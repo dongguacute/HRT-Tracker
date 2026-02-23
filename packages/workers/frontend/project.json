@@ -1,0 +1,14 @@
+{
+  "name": "hrt-tracker-frontend",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "packages/workers/frontend/app",
+  "targets": {
+    "build": {
+      "command": "pnpm --filter hrt-tracker-frontend build && mkdir -p ./build/client && cp -r packages/workers/frontend/build/client/* ./build/client/"
+    },
+    "dev": {
+      "command": "pnpm --filter hrt-tracker-frontend dev"
+    }
+  }
+}

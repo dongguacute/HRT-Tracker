@@ -1,0 +1,25 @@
+{
+  "name": "HRT-Tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nx run-many --target=dev --all --parallel=2",
+    "build": "nx run-many --target=build --all --parallel=2",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Cherry<me@dgct.cc>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@nx/js": "^22.5.2",
+    "@nx/react": "^22.5.2",
+    "@nx/vite": "^22.5.2",
+    "@nx/workspace": "^22.5.2",
+    "@types/node": "^22.19.11",
+    "nx": "^22.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
