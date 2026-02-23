@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
 
-const app = new Hono()
+const app = new Hono().basePath('/api')
 
-app.get('/', (c) => {
+app.get('/hello', (c) => {
   return c.json({
-    message: 'Hello Hono!'
+    message: 'Hello Hono from /api/hello!'
   })
 })
 
