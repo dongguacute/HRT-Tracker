@@ -5,10 +5,10 @@
   "sourceRoot": "packages/workers/frontend/app",
   "targets": {
     "build": {
-      "command": "pnpm --filter hrt-tracker-frontend build && mkdir -p ./build/client && cp -r packages/workers/frontend/build/client/* ./build/client/"
+      "command": "pnpm --filter @hrt-tracker/frontend build && mkdir -p ./build/client && cp -r packages/workers/frontend/build/client/* ./build/client/"
     },
     "dev": {
-      "command": "pnpm --filter hrt-tracker-frontend dev"
+      "command": "pnpm --filter @hrt-tracker/frontend dev"
     }
   }
 }

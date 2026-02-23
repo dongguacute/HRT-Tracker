@@ -5,10 +5,10 @@
   "sourceRoot": "packages/workers/backend/src",
   "targets": {
     "build": {
-      "command": "pnpm --filter hrt-tracker-backend build"
+      "command": "pnpm --filter @hrt-tracker/backend build"
     },
     "dev": {
-      "command": "pnpm --filter hrt-tracker-backend dev"
+      "command": "pnpm --filter @hrt-tracker/backend dev"
     }
   }
 }

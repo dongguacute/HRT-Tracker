@@ -13,13 +13,16 @@
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@nx/js": "^22.5.2",
     "@nx/react": "^22.5.2",
     "@nx/vite": "^22.5.2",
     "@nx/workspace": "^22.5.2",
     "@types/node": "^22.19.11",
+    "eslint": "^10.0.1",
     "nx": "^22.5.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0"
   }
 }
