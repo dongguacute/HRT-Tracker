@@ -1,5 +1,5 @@
 {
-  "name": "@estrogen-pk/core",
+  "name": "@hrt-tracker/core",
   "version": "1.0.0",
   "description": "Production-grade TypeScript core library for estradiol pharmacokinetic modeling.",
   "main": "dist/index.js",
