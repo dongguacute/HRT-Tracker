@@ -1,11 +1,16 @@
 {
   "name": "hrt-tracker-backend",
-  "main": "packages/workers/backend/src/index.tsx",
+  "main": "build/server/index.js",
   "compatibility_date": "2025-08-03",
   "compatibility_flags": [
     "nodejs_compat"
   ],
   "$schema": "./node_modules/wrangler/config-schema.json",
+  "assets": {
+    "directory": "build/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
   "durable_objects": {
     "bindings": [
       {
@@ -22,15 +27,5 @@
   ],
   "observability": {
     "enabled": true
-  },
-  "env": {
-    "production": {
-      "main": "build/server/index.js",
-      "assets": {
-        "directory": "build/client",
-        "binding": "ASSETS",
-        "not_found_handling": "single-page-application"
-      }
-    }
   }
 }
