@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfDay, addDays, differenceInHours } from "date-fns";
 import { 
@@ -42,6 +42,22 @@ export default function Home() {
   const [showNotice, setShowNotice] = useState(false);
   const handleConfirmNotice = () => setShowNotice(false);
   const [isDark, setIsDark] = useState(false);
+  const chartRef = useRef<any>(null);
+
+  const handleRefresh = () => {
+    setRecords(medicationStorage.getRecords());
+    setLabRecords(labStorage.getRecords());
+    
+    // 重置图表缩放
+    if (chartRef.current) {
+      const echartsInstance = chartRef.current.getEchartsInstance();
+      echartsInstance.dispatchAction({
+        type: 'dataZoom',
+        start: 0,
+        end: 100
+      });
+    }
+  };
 
   useEffect(() => {
     const checkTheme = () => {
@@ -437,7 +453,10 @@ export default function Home() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('home.blood_conc')}</h3>
           </div>
-          <button className="p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors text-gray-400 dark:text-gray-500">
+          <button 
+            onClick={handleRefresh}
+            className="p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors text-gray-400 dark:text-gray-500"
+          >
             <RotateCcw className="w-5 h-5" />
           </button>
         </div>
@@ -448,6 +467,7 @@ export default function Home() {
               <div className="w-full h-full flex items-center justify-center text-gray-400">{t('home.calculating')}</div>
             ) : (
               <ReactECharts 
+                ref={chartRef}
                 option={chartOption} 
                 style={{ height: '100%', width: '100%' }}
                 notMerge={true}
