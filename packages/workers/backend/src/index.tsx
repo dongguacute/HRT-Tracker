@@ -1,7 +1,9 @@
 import { Hono, Context, Next } from 'hono'
 import { runSimulation } from '@hrt-tracker/core'
+// @ts-ignore
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie'
 import { config } from 'dotenv'
+// @ts-ignore
 import { argon2id, argon2Verify } from 'hash-wasm'
 import { authMiddleware, adminMiddleware } from './middleware/auth'
 
@@ -163,8 +165,9 @@ app.post('/admin/users', authMiddleware, adminMiddleware, async (c) => {
       return c.json({ error: 'User already exists' }, 400)
     }
 
-    const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
-    const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+    const cryptoObj = (typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto) as any;
+    const salt = new Uint8Array(16);
+    cryptoObj.getRandomValues(salt);
     
     const hashedPassword = await argon2id({ 
       password, 
@@ -179,7 +182,12 @@ app.post('/admin/users', authMiddleware, adminMiddleware, async (c) => {
     return c.json({ success: true })
   } catch (e: any) {
     console.error('Create user error:', e)
-    return c.json({ error: 'Internal Server Error', message: e.message }, 500)
+    return c.json({ 
+      error: 'Internal Server Error', 
+      message: e.message,
+      stack: e.stack,
+      type: e.constructor.name
+    }, 500)
   }
 })
 
@@ -200,8 +208,9 @@ app.patch('/admin/users/:username', authMiddleware, adminMiddleware, async (c) =
     return c.json({ error: 'Cannot modify admin password via this API' }, 403)
   }
 
-  const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
-  const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+  const cryptoObj = (typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto) as any;
+  const salt = new Uint8Array(16);
+  cryptoObj.getRandomValues(salt);
   user.password = await argon2id({ 
     password, 
     salt,
@@ -236,8 +245,9 @@ app.patch('/auth/password', authMiddleware, async (c) => {
     return c.json({ error: 'Invalid old password' }, 400)
   }
 
-  const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
-  const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+  const cryptoObj = (typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto) as any;
+  const salt = new Uint8Array(16);
+  cryptoObj.getRandomValues(salt);
   user.password = await argon2id({ 
     password: newPassword, 
     salt,
@@ -298,7 +308,12 @@ app.get('/admin/users', authMiddleware, adminMiddleware, async (c) => {
     return c.json({ users: users.map((u: any) => ({ username: u.username, role: u.role })) })
   } catch (e: any) {
     console.error('Get users error:', e)
-    return c.json({ error: 'Internal Server Error', message: e.message }, 500)
+    return c.json({ 
+      error: 'Internal Server Error', 
+      message: e.message,
+      stack: e.stack,
+      type: e.constructor.name
+    }, 500)
   }
 })
 
