@@ -30,9 +30,9 @@ We strictly adhere to the `PKcore.swift` and `PKparameter.swift` logic provided 
 
   **舌下服用指导**：基于严格的医学建模，提供详细的“含服时间（Hold Time）”与吸收参数（$\theta$）参考。
 
-* **Privacy First**: All data is stored entirely in your browser's `localStorage`. No data is ever sent to a server.<br>
+* **Privacy First**: All data is stored entirely in your browser's `localStorage`. No data is ever sent to a server by default. Optional cloud sync is available for multi-device support.<br>
 
-  **隐私优先**：所有数据都完全存储在你浏览器的 `localStorage` 中，绝不会发送到任何服务器。
+  **隐私优先**：默认情况下，所有数据都完全存储在你浏览器的 `localStorage` 中，绝不会发送到任何服务器。支持可选的云端同步功能，方便多设备使用。
 
 * **Internationalization**: Native support for **Simplified Chinese** and **English**, **Traditional Chinese**, **Japanese** and more.<br>
 
@@ -72,6 +72,26 @@ This project is built with **React** and **TypeScript**. You can run it easily u
 You are **very welcome** to deploy this application to your own personal website, blog, or server!<br>
 
 我们**非常欢迎**你将此应用部署到自己的个人网站、博客或服务器上！
+
+### Cloud Deployment (Cloudflare Workers) 云端部署
+
+This project is optimized for **Cloudflare Workers**. It supports account systems and cloud data synchronization.<br>
+
+本项目针对 **Cloudflare Workers** 进行了优化，支持账号系统与云端数据同步。
+
+**Features:**
+- **Account System**: Secure login and multi-user support.
+- **Cloud Sync**: Sync your records and settings across devices.
+- **Durable Storage**: Data is stored using Cloudflare Durable Objects or local file fallback.
+
+**Deployment Steps:**
+1. **Frontend**: Deploy `packages/workers/frontend` to Cloudflare Pages or any static hosting.
+2. **Backend**: Deploy `packages/workers/backend` to Cloudflare Workers.
+   - Configure `USER_STORAGE` Durable Object.
+   - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in environment variables.
+   - Set `JWT_SECRET` for secure authentication.
+
+---
 
 We want this tool to be accessible to everyone who needs it. You do not need explicit permission to host it.<br>
 
