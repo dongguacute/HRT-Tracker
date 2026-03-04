@@ -6,10 +6,12 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
 import { Sidebar } from "./components/sidebar";
+import { settingsStorage } from "./utils/storage";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,6 +27,56 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // 初始化主题
+    const updateTheme = () => {
+      const settings = settingsStorage.getSettings();
+      const root = window.document.documentElement;
+      const theme = settings.theme === 'system' 
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : settings.theme;
+      
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
+    updateTheme();
+
+    // 监听系统主题变化
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      const settings = settingsStorage.getSettings();
+      if (settings.theme === 'system') {
+        updateTheme();
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+
+    // 监听 localStorage 变化（处理其他页面/标签页的设置更新）
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'hrt_settings') {
+        updateTheme();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // 监听自定义事件（处理同页面内的设置更新）
+    const handleCustomThemeChange = () => {
+      updateTheme();
+    };
+    window.addEventListener('theme-change', handleCustomThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('theme-change', handleCustomThemeChange);
+    };
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -33,9 +85,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="flex h-screen overflow-hidden bg-gray-50">
+      <body className="flex h-screen overflow-hidden bg-gray-50 dark:bg-background">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-white rounded-l-[32px] my-2 mr-2 shadow-sm border border-gray-100">
+        <main className="flex-1 overflow-y-auto bg-white dark:bg-background shadow-sm border border-gray-100 dark:border-white/[0.05]">
           {children}
         </main>
         <ScrollRestoration />

@@ -18,6 +18,76 @@ export interface LabRecord {
 
 const STORAGE_KEY = 'hrt_medication_records';
 const LAB_STORAGE_KEY = 'hrt_lab_records';
+const SETTINGS_STORAGE_KEY = 'hrt_settings';
+
+export interface Settings {
+  theme: 'light' | 'dark' | 'system';
+  weight: number;
+  hasAcceptedDisclaimer: boolean;
+}
+
+const DEFAULT_SETTINGS: Settings = {
+  theme: 'system',
+  weight: 60,
+  hasAcceptedDisclaimer: false,
+};
+
+export const settingsStorage = {
+  getSettings: (): Settings => {
+    if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!stored) return DEFAULT_SETTINGS;
+    try {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+    } catch (e) {
+      console.error('Failed to parse settings', e);
+      return DEFAULT_SETTINGS;
+    }
+  },
+
+  saveSettings: (settings: Partial<Settings>) => {
+    const current = settingsStorage.getSettings();
+    const updated = { ...current, ...settings };
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
+    
+    // 如果修改了主题，触发自定义事件通知 root.tsx 更新
+    if (settings.theme) {
+      window.dispatchEvent(new Event('theme-change'));
+    }
+    
+    return updated;
+  },
+
+  exportData: () => {
+    const data = {
+      medicationRecords: medicationStorage.getRecords(),
+      labRecords: labStorage.getRecords(),
+      settings: settingsStorage.getSettings(),
+      exportDate: new Date().toISOString(),
+      version: '1.0.0'
+    };
+    return JSON.stringify(data, null, 2);
+  },
+
+  importData: (jsonString: string) => {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data.medicationRecords) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.medicationRecords));
+      }
+      if (data.labRecords) {
+        localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(data.labRecords));
+      }
+      if (data.settings) {
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data.settings));
+      }
+      return true;
+    } catch (e) {
+      console.error('Failed to import data', e);
+      return false;
+    }
+  }
+};
 
 export const medicationStorage = {
   getRecords: (): MedicationRecord[] => {

@@ -4,4 +4,5 @@ export default [
   index("routes/home.tsx"),
   route("records", "routes/records.tsx"),
   route("calibration", "routes/calibration.tsx"),
+  route("settings", "routes/settings.tsx"),
 ] satisfies RouteConfig;
