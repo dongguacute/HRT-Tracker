@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import ReactECharts from 'echarts-for-react';
 import { cn } from "../utils/cn";
-import { medicationStorage } from "../utils/storage";
-import { runSimulation, Ester, Route, type DoseEvent } from "@hrt-tracker/core";
+import { medicationStorage, labStorage } from "../utils/storage";
+import { runSimulation, Ester, Route, type DoseEvent, createCalibrationInterpolator, type LabResult as CoreLabResult, interpolateConcentration } from "@hrt-tracker/core";
 
 const METHODS = [
   { id: "Injection", route: Route.Injection },
@@ -30,10 +30,57 @@ const TYPES = [
 
 export default function Home() {
   const [records, setRecords] = useState<any[]>([]);
+  const [labRecords, setLabRecords] = useState<any[]>([]);
   const [showNotice, setShowNotice] = useState(false);
+
+  // 计算当前校准倍率
+  const currentCalibrationRatio = useMemo(() => {
+    const defaultVal = { ratio: 1.0, theory: 0, actual: 0 };
+    if (records.length === 0 || labRecords.length === 0) return defaultVal;
+    
+    try {
+      const now = new Date();
+      const baseTime = now;
+      const events: DoseEvent[] = records.map(r => {
+        const method = METHODS.find(m => m.id === r.method);
+        const type = TYPES.find(t => t.id === r.type);
+        return {
+          id: r.id,
+          timeH: (new Date(r.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+          doseMG: r.dosage,
+          ester: type?.ester || Ester.EV,
+          route: method?.route || Route.Injection,
+        };
+      });
+
+      const result = runSimulation(events, 60);
+      if (!result) return defaultVal;
+
+      const coreLabResults: CoreLabResult[] = labRecords.map(lr => ({
+        id: lr.id,
+        timeH: (new Date(lr.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+        concValue: lr.value,
+        unit: lr.unit
+      }));
+      
+      const latestLab = coreLabResults[0]; // 获取最近的一次血检
+      const theoryAtLab = interpolateConcentration(result, latestLab.timeH, 'concPGmL_E2') || 0;
+      
+      const interpolator = createCalibrationInterpolator(result, coreLabResults);
+      return {
+        ratio: interpolator(0),
+        theory: theoryAtLab,
+        actual: latestLab.concValue
+      };
+    } catch (e) {
+      console.error("Error calculating calibration ratio:", e);
+      return defaultVal;
+    }
+  }, [records, labRecords]);
 
   useEffect(() => {
     setRecords(medicationStorage.getRecords());
+    setLabRecords(labStorage.getRecords());
   }, []);
 
   const handleConfirmNotice = () => {
@@ -45,14 +92,18 @@ export default function Home() {
     try {
       if (records.length === 0) return [];
 
+      const now = new Date();
+      // 使用精确的当前时间作为基准点 0
+      const baseTime = now;
+
       const events: DoseEvent[] = records.map(r => {
         const method = METHODS.find(m => m.id === r.method);
         const type = TYPES.find(t => t.id === r.type);
         const timeDate = new Date(r.time);
-        const nowStart = startOfDay(new Date());
         return {
           id: r.id,
-          timeH: differenceInHours(timeDate, nowStart),
+          // 计算相对于当前时间的精确小时差
+          timeH: (timeDate.getTime() - baseTime.getTime()) / (1000 * 60 * 60),
           doseMG: r.dosage,
           ester: type?.ester || Ester.EV,
           route: method?.route || Route.Injection,
@@ -64,21 +115,35 @@ export default function Home() {
         return [];
       }
 
+      // 处理校准
+      let finalConc_E2 = [...result.concPGmL_E2];
+      if (labRecords.length > 0) {
+        const coreLabResults: CoreLabResult[] = labRecords.map(lr => ({
+          id: lr.id,
+          timeH: (new Date(lr.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+          concValue: lr.value,
+          unit: lr.unit
+        }));
+        
+        const interpolator = createCalibrationInterpolator(result, coreLabResults);
+        finalConc_E2 = result.timeH.map((t, i) => result.concPGmL_E2[i] * interpolator(t));
+      }
+
       if (!result.timeH || !result.concPGmL_E2 || !result.concPGmL_CPA) {
         return [];
       }
 
       return result.timeH.map((t: number, i: number) => ({
         time: t,
-        displayTime: format(addDays(startOfDay(new Date()), t / 24), "M月d日"),
-        e2: Math.round(result.concPGmL_E2[i] || 0),
+        displayTime: format(addDays(baseTime, t / 24), "M月d日 HH:mm"),
+        e2: Math.round(finalConc_E2[i] || 0),
         cpa: Math.round(result.concPGmL_CPA[i] || 0),
       }));
     } catch (error) {
       console.error("Error in simulationData useMemo:", error);
       return [];
     }
-  }, [records]);
+  }, [records, labRecords]);
 
   const currentE2 = simulationData.length > 0 ? simulationData.find((d: any) => d.time >= 0)?.e2 || 0 : 0;
 
@@ -269,6 +334,23 @@ export default function Home() {
               <span className="text-5xl font-black text-gray-900">{currentE2}</span>
               <span className="text-sm font-bold text-gray-400">pg/mL</span>
             </div>
+            {labRecords.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">校准倍率</span>
+                  <span className={cn(
+                    "text-xs font-black px-1.5 py-0.5 rounded-md",
+                    currentCalibrationRatio.ratio > 1.2 ? "bg-orange-50 text-orange-500" : 
+                    currentCalibrationRatio.ratio < 0.8 ? "bg-blue-50 text-blue-500" : "bg-gray-50 text-gray-400"
+                  )}>
+                    x{currentCalibrationRatio.ratio.toFixed(2)}
+                  </span>
+                </div>
+                <div className="text-[10px] text-gray-400 font-medium">
+                  最近血检: {currentCalibrationRatio.actual} pg/mL (理论: {Math.round(currentCalibrationRatio.theory)} pg/mL)
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="space-y-1">

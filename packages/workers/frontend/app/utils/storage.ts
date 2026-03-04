@@ -8,7 +8,16 @@ export interface MedicationRecord {
   createdAt: string;
 }
 
+export interface LabRecord {
+  id: string;
+  time: string; // ISO string
+  value: number;
+  unit: 'pg/ml' | 'pmol/l';
+  createdAt: string;
+}
+
 const STORAGE_KEY = 'hrt_medication_records';
+const LAB_STORAGE_KEY = 'hrt_lab_records';
 
 export const medicationStorage = {
   getRecords: (): MedicationRecord[] => {
@@ -27,7 +36,7 @@ export const medicationStorage = {
     const records = medicationStorage.getRecords();
     const newRecord: MedicationRecord = {
       ...record,
-      id: crypto.randomUUID(),
+      id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2),
       createdAt: new Date().toISOString(),
     };
     const updated = [newRecord, ...records];
@@ -45,6 +54,45 @@ export const medicationStorage = {
     const records = medicationStorage.getRecords();
     const updated = records.map(r => r.id === id ? { ...r, ...record } : r);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    return updated.find(r => r.id === id);
+  }
+};
+
+export const labStorage = {
+  getRecords: (): LabRecord[] => {
+    if (typeof window === 'undefined') return [];
+    const stored = localStorage.getItem(LAB_STORAGE_KEY);
+    if (!stored) return [];
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Failed to parse lab records', e);
+      return [];
+    }
+  },
+
+  saveRecord: (record: Omit<LabRecord, 'id' | 'createdAt'>) => {
+    const records = labStorage.getRecords();
+    const newRecord: LabRecord = {
+      ...record,
+      id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [newRecord, ...records].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+    localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
+    return newRecord;
+  },
+
+  deleteRecord: (id: string) => {
+    const records = labStorage.getRecords();
+    const updated = records.filter(r => r.id !== id);
+    localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
+  },
+
+  updateRecord: (id: string, record: Partial<Omit<LabRecord, 'id' | 'createdAt'>>) => {
+    const records = labStorage.getRecords();
+    const updated = records.map(r => r.id === id ? { ...r, ...record } : r);
+    localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
     return updated.find(r => r.id === id);
   }
 };

@@ -3,4 +3,5 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 export default [
   index("routes/home.tsx"),
   route("records", "routes/records.tsx"),
+  route("calibration", "routes/calibration.tsx"),
 ] satisfies RouteConfig;
