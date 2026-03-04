@@ -38,6 +38,7 @@ export default function Home() {
     setLabRecords(labStorage.getRecords());
   }, []);
   const [showNotice, setShowNotice] = useState(false);
+  const handleConfirmNotice = () => setShowNotice(false);
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {

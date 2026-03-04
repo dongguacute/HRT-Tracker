@@ -22,11 +22,22 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router'],
-          'vendor-utils': ['date-fns', 'framer-motion', 'lucide-react', 'clsx', 'tailwind-merge'],
-          'vendor-charts': ['echarts-for-react', 'recharts'],
-          'vendor-ui': ['react-day-picker'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react';
+            }
+            if (id.includes('date-fns') || id.includes('framer-motion') || id.includes('lucide-react') || id.includes('clsx') || id.includes('tailwind-merge')) {
+              return 'vendor-utils';
+            }
+            if (id.includes('echarts') || id.includes('recharts')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('react-day-picker')) {
+              return 'vendor-ui';
+            }
+            return 'vendor';
+          }
         },
       },
     },
