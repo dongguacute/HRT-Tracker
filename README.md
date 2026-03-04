@@ -96,5 +96,9 @@ I wish you a smooth transition and Happy Estimating! 🏳️‍⚧️<br>
 <br>
 At the same time, I wish good health to all the women using this web app who are going through menopause. ❤️
 
-# LICENCE
+## 特别鸣谢（原作者）
+
+[SmirnovaOyama](https://github.com/SmirnovaOyama)
+
+## LICENCE
 本项目遵守 MIT Licence
