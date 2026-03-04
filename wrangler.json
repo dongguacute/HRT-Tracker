@@ -9,11 +9,18 @@
     "directory": "build/client",
     "binding": "ASSETS"
   },
-  "d1_databases": [
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "USER_STORAGE",
+        "class_name": "UserStorage"
+      }
+    ]
+  },
+  "migrations": [
     {
-      "binding": "DB",
-      "database_name": "hrt-tracker-db",
-      "database_id": "YOUR_DATABASE_ID_HERE"
+      "tag": "v1",
+      "new_sqlite_classes": ["UserStorage"]
     }
   ],
   "observability": {
