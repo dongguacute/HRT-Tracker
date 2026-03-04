@@ -371,7 +371,7 @@ export default function CalibrationPage() {
                     
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-bold text-gray-900 dark:text-white">雌二醇 (E2)</h4>
+                        <h4 className="font-bold text-gray-900 dark:text-white">{t('home.estradiol')} (E2)</h4>
                         <span className="text-sm text-gray-400 dark:text-gray-500 font-medium">
                           {format(date, "yyyy-MM-dd HH:mm")}
                         </span>

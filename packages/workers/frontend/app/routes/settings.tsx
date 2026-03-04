@@ -100,10 +100,10 @@ export default function SettingsPage() {
               <span className="font-bold text-gray-900 dark:text-white">
                 {[
                   { id: 'zh-CN', label: '简体中文' },
-                  { id: 'zh-TW', label: '繁體中文' },
+                  { id: 'zh-Hant', label: '繁體中文' },
                   { id: 'en', label: 'English' },
                   { id: 'ja', label: '日本語' },
-                ].find(l => l.id === i18n.language || (l.id === 'zh-CN' && i18n.language.startsWith('zh') && i18n.language !== 'zh-TW'))?.label || '简体中文'}
+                ].find(l => l.id === i18n.language || (l.id === 'zh-CN' && i18n.language.startsWith('zh') && !['zh-TW', 'zh-HK', 'zh-Hant'].includes(i18n.language)))?.label || '简体中文'}
               </span>
             </div>
             <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform", isLangOpen && "rotate-180")} />
@@ -119,7 +119,7 @@ export default function SettingsPage() {
               >
                 {[
                   { id: 'zh-CN', label: '简体中文' },
-                  { id: 'zh-TW', label: '繁體中文' },
+                  { id: 'zh-Hant', label: '繁體中文' },
                   { id: 'en', label: 'English' },
                   { id: 'ja', label: '日本語' },
                 ].map((item) => (
@@ -133,13 +133,13 @@ export default function SettingsPage() {
                   >
                     <span className={cn(
                       "font-bold",
-                      (i18n.language === item.id || (item.id === 'zh-CN' && i18n.language.startsWith('zh') && i18n.language !== 'zh-TW'))
+                      (i18n.language === item.id || (item.id === 'zh-CN' && i18n.language.startsWith('zh') && !['zh-TW', 'zh-HK', 'zh-Hant'].includes(i18n.language)))
                         ? "text-[#00A37B]"
                         : "text-gray-700 dark:text-gray-300"
                     )}>
                       {item.label}
                     </span>
-                    {(i18n.language === item.id || (item.id === 'zh-CN' && i18n.language.startsWith('zh') && i18n.language !== 'zh-TW')) && (
+                    {(i18n.language === item.id || (item.id === 'zh-CN' && i18n.language.startsWith('zh') && !['zh-TW', 'zh-HK', 'zh-Hant'].includes(i18n.language))) && (
                       <Check className="w-5 h-5 text-[#00A37B]" />
                     )}
                   </button>
@@ -178,15 +178,15 @@ export default function SettingsPage() {
 
       {/* 体重设置 */}
       <section className="space-y-4">
-        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">身体参数</h2>
+        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('common.body_params.title')}</h2>
         <div className="bg-white dark:bg-card rounded-[32px] p-6 border border-gray-100 dark:border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
               <Weight className="w-6 h-6 text-blue-500 dark:text-blue-400" />
             </div>
             <div>
-              <div className="font-bold text-gray-900 dark:text-white">体重 (kg)</div>
-              <div className="text-xs text-gray-400 dark:text-gray-500">用于药代动力学模型估算峰值</div>
+              <div className="font-bold text-gray-900 dark:text-white">{t('common.body_params.weight')}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500">{t('common.body_params.weight_desc')}</div>
             </div>
           </div>
           <input

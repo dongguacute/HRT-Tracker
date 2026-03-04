@@ -21,6 +21,8 @@
     "confirm": "确认",
     "success": "成功",
     "error": "错误",
+    "day": "天",
+    "loading": "加载中...",
     "disclaimer_clear": "此操作将永久删除所有用药记录、化验记录和个性化设置，且无法撤销。建议在操作前先导出数据备份。",
     "model_explanation_desc": "了解药代动力学模型的科学原理",
     "github_repo_desc": "本项目的源代码仓库",
@@ -31,6 +33,17 @@
     "disclaimer_4": "4. 开发者不对因使用本软件或其提供的信息而产生的任何直接或间接后果承担任何责任。",
     "account": {
       "title": "账户设置",
+      "info": "账号信息",
+      "manage_desc": "管理您的个人账号设置",
+      "logout": "退出登录",
+      "basic_info": "基本信息",
+      "username": "用户名",
+      "role": "账号角色",
+      "role_admin": "管理员",
+      "role_user": "普通用户",
+      "security_settings": "安全设置",
+      "admin_password_notice": "管理员账号密码由系统环境变量管理。如需修改，请前往用户管理中心管理其他用户。",
+      "go_to_user_management": "前往用户管理中心",
       "change_password": "修改密码",
       "old_password": "旧密码",
       "new_password": "新密码",
@@ -46,6 +59,41 @@
       "calibration": "校准",
       "settings": "设置",
       "account": "账户"
+    },
+    "body_params": {
+      "title": "身体参数",
+      "weight": "体重 (kg)",
+      "weight_desc": "用于药代动力学模型估算峰值"
+    }
+  },
+  "auth": {
+    "login": "登录",
+    "logging_in": "登录中...",
+    "username": "用户名",
+    "password": "密码",
+    "login_failed": "登录失败",
+    "network_error": "网络错误，请稍后再试",
+    "please_login": "请登录您的账号"
+  },
+  "admin": {
+    "users": {
+      "title": "用户管理",
+      "manage_desc": "创建和管理普通用户账号",
+      "create_user": "新建用户",
+      "add_user": "添加用户",
+      "username": "用户名",
+      "password": "密码",
+      "new_password": "新密码",
+      "role": "角色",
+      "actions": "操作",
+      "no_users": "暂无普通用户",
+      "delete_confirm": "确定要删除用户 {{username}} 吗？",
+      "create_success": "用户创建成功",
+      "delete_success": "用户删除成功",
+      "password_updated": "用户 {{username}} 的密码已更新",
+      "fetch_failed": "获取数据失败",
+      "admin_only": "只有管理员可以访问此页面",
+      "network_error": "网络错误"
     }
   },
   "home": {
@@ -113,6 +161,12 @@
       "Gel": "凝胶",
       "Oral": "口服",
       "Sublingual": "舌下"
+    },
+    "types": {
+      "EB": "苯甲酸雌二醇 (EB)",
+      "EV": "戊酸雌二醇 (EV)",
+      "EC": "环戊丙酸雌二醇 (EC)",
+      "EN": "庚酸雌二醇 (EN)"
     }
   },
   "calibration": {

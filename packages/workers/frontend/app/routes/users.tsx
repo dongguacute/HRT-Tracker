@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { UserPlus, Users, Trash2, ShieldCheck, User as UserIcon, Key, X, Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface User {
   username: string;
@@ -8,6 +9,7 @@ interface User {
 }
 
 export default function UserManagement() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -42,7 +44,7 @@ export default function UserManagement() {
       setCurrentUser(meData.user);
 
       if (meData.user.role !== 'admin') {
-        setError("只有管理员可以访问此页面");
+        setError(t('admin.users.admin_only'));
         setLoading(false);
         return;
       }
@@ -52,7 +54,7 @@ export default function UserManagement() {
         setUsers(usersData.users);
       }
     } catch (err) {
-      setError("获取数据失败");
+      setError(t('admin.users.fetch_failed'));
     } finally {
       setLoading(false);
     }
@@ -72,19 +74,19 @@ export default function UserManagement() {
       if (res.ok) {
         setNewUsername("");
         setNewPassword("");
-        setSuccess("用户创建成功");
+        setSuccess(t('admin.users.create_success'));
         fetchData();
       } else {
         const data = await res.json();
-        setError(data.error || "创建用户失败");
+        setError(data.error || t('admin.users.create_failed', '创建用户失败'));
       }
     } catch (err) {
-      setError("网络错误");
+      setError(t('admin.users.network_error'));
     }
   };
 
   const handleDeleteUser = async (username: string) => {
-    if (!confirm(`确定要删除用户 ${username} 吗？`)) return;
+    if (!confirm(t('admin.users.delete_confirm', { username }))) return;
     
     setError("");
     setSuccess("");
@@ -94,14 +96,14 @@ export default function UserManagement() {
       });
 
       if (res.ok) {
-        setSuccess("用户删除成功");
+        setSuccess(t('admin.users.delete_success'));
         fetchData();
       } else {
         const data = await res.json();
-        setError(data.error || "删除失败");
+        setError(data.error || t('admin.users.delete_failed', '删除失败'));
       }
     } catch (err) {
-      setError("网络错误");
+      setError(t('admin.users.network_error'));
     }
   };
 
@@ -118,20 +120,20 @@ export default function UserManagement() {
       });
 
       if (res.ok) {
-        setSuccess(`用户 ${username} 的密码已更新`);
+        setSuccess(t('admin.users.password_updated', { username }));
         setEditingUser(null);
         setEditPassword("");
         fetchData();
       } else {
         const data = await res.json();
-        setError(data.error || "更新密码失败");
+        setError(data.error || t('admin.users.update_password_failed', '更新密码失败'));
       }
     } catch (err) {
-      setError("网络错误");
+      setError(t('admin.users.network_error'));
     }
   };
 
-  if (loading) return <div className="p-8 text-center">加载中...</div>;
+  if (loading) return <div className="p-8 text-center">{t('common.loading')}</div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">
@@ -139,9 +141,9 @@ export default function UserManagement() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Users className="h-6 w-6 text-blue-600" />
-            用户管理
+            {t('admin.users.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">创建和管理普通用户账号</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('admin.users.manage_desc')}</p>
         </div>
       </div>
 
@@ -161,12 +163,12 @@ export default function UserManagement() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            新建用户
+            {t('admin.users.create_user')}
           </h2>
           <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
-              placeholder="用户名"
+              placeholder={t('admin.users.username')}
               className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
@@ -174,7 +176,7 @@ export default function UserManagement() {
             />
             <input
               type="password"
-              placeholder="密码"
+              placeholder={t('admin.users.password')}
               className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -184,7 +186,7 @@ export default function UserManagement() {
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition-colors"
             >
-              添加用户
+              {t('admin.users.add_user')}
             </button>
           </form>
         </div>
@@ -194,9 +196,9 @@ export default function UserManagement() {
         <table className="w-full text-left">
           <thead className="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-6 py-4 font-semibold">用户名</th>
-              <th className="px-6 py-4 font-semibold">角色</th>
-              <th className="px-6 py-4 font-semibold">操作</th>
+              <th className="px-6 py-4 font-semibold">{t('admin.users.username')}</th>
+              <th className="px-6 py-4 font-semibold">{t('admin.users.role')}</th>
+              <th className="px-6 py-4 font-semibold">{t('admin.users.actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -214,7 +216,7 @@ export default function UserManagement() {
                       ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' 
                       : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                   }`}>
-                    {user.role === 'admin' ? '管理员' : '普通用户'}
+                    {user.role === 'admin' ? t('common.account.role_admin') : t('common.account.role_user')}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -224,7 +226,7 @@ export default function UserManagement() {
                         <div className="flex items-center gap-2">
                           <input
                             type="password"
-                            placeholder="新密码"
+                            placeholder={t('admin.users.new_password')}
                             className="px-2 py-1 text-sm rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 w-32"
                             value={editPassword}
                             onChange={(e) => setEditPassword(e.target.value)}
@@ -233,14 +235,14 @@ export default function UserManagement() {
                           <button 
                             onClick={() => handleUpdatePassword(user.username)}
                             className="text-green-500 hover:text-green-700 p-1"
-                            title="保存"
+                            title={t('common.confirm')}
                           >
                             <Check className="h-4 w-4" />
                           </button>
                           <button 
                             onClick={() => { setEditingUser(null); setEditPassword(""); }}
                             className="text-gray-400 hover:text-gray-600 p-1"
-                            title="取消"
+                            title={t('common.cancel')}
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -250,14 +252,14 @@ export default function UserManagement() {
                           <button 
                             onClick={() => setEditingUser(user.username)}
                             className="text-blue-500 hover:text-blue-700 p-2 transition-colors"
-                            title="修改密码"
+                            title={t('common.account.change_password')}
                           >
                             <Key className="h-4 w-4" />
                           </button>
                           <button 
                             onClick={() => handleDeleteUser(user.username)}
                             className="text-red-500 hover:text-red-700 p-2 transition-colors"
-                            title="删除用户"
+                            title={t('common.clear_all_data')}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -271,7 +273,7 @@ export default function UserManagement() {
             {users.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                  暂无普通用户
+                  {t('admin.users.no_users')}
                 </td>
               </tr>
             )}

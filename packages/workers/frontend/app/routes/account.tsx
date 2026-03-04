@@ -99,7 +99,7 @@ export default function Account() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">加载中...</div>;
+  if (loading) return <div className="p-8 text-center">{t('common.loading')}</div>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">
@@ -107,16 +107,16 @@ export default function Account() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <UserCircle className="h-6 w-6 text-blue-600" />
-            账号信息
+            {t('common.account.info')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">管理您的个人账号设置</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('common.account.manage_desc')}</p>
         </div>
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
         >
           <LogOut className="h-4 w-4" />
-          退出登录
+          {t('common.account.logout')}
         </button>
       </div>
 
@@ -124,22 +124,22 @@ export default function Account() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <User className="h-5 w-5 text-gray-400" />
-            基本信息
+            {t('common.account.basic_info')}
           </h2>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-gray-500 uppercase font-bold tracking-wider">用户名</label>
+              <label className="text-xs text-gray-500 uppercase font-bold tracking-wider">{t('common.account.username')}</label>
               <p className="text-lg font-medium text-gray-900 dark:text-white">{user?.username}</p>
             </div>
             <div>
-              <label className="text-xs text-gray-500 uppercase font-bold tracking-wider">账号角色</label>
+              <label className="text-xs text-gray-500 uppercase font-bold tracking-wider">{t('common.account.role')}</label>
               <div className="mt-1">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   user?.role === 'admin' 
                     ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' 
                     : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                 }`}>
-                  {user?.role === 'admin' ? '管理员' : '普通用户'}
+                  {user?.role === 'admin' ? t('common.account.role_admin') : t('common.account.role_user')}
                 </span>
               </div>
             </div>
@@ -149,13 +149,13 @@ export default function Account() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Key className="h-5 w-5 text-gray-400" />
-            安全设置
+            {t('common.account.security_settings')}
           </h2>
           
           {user?.role === 'admin' ? (
             <div className="space-y-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                管理员账号密码由系统环境变量管理。如需修改，请前往用户管理中心管理其他用户。
+                {t('common.account.admin_password_notice')}
               </p>
               <div className="pt-2">
                 <button
@@ -163,7 +163,7 @@ export default function Account() {
                   className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
                 >
                   <Shield className="h-4 w-4" />
-                  前往用户管理中心
+                  {t('common.account.go_to_user_management')}
                 </button>
               </div>
             </div>

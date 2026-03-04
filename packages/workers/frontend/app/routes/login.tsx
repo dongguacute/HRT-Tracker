@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Lock, User, LogIn } from "lucide-react";
 
 export default function Login() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,10 +32,10 @@ export default function Login() {
         }
       } else {
         const data = await res.json();
-        setError(data.error || "登录失败");
+        setError(data.error || t('auth.login_failed'));
       }
     } catch (err) {
-      setError("网络错误，请稍后再试");
+      setError(t('auth.network_error'));
     } finally {
       setLoading(false);
     }
@@ -47,7 +49,7 @@ export default function Login() {
             <LogIn className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">HRT Tracker</h2>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">请登录您的账号</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t('auth.please_login')}</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -60,7 +62,7 @@ export default function Login() {
                 type="text"
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="用户名"
+                placeholder={t('auth.username')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
@@ -73,7 +75,7 @@ export default function Login() {
                 type="password"
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="密码"
+                placeholder={t('auth.password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -91,7 +93,7 @@ export default function Login() {
             disabled={loading}
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {loading ? "登录中..." : "登录"}
+            {loading ? t('auth.logging_in') : t('auth.login')}
           </button>
         </form>
       </div>

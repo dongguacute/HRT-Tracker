@@ -45,10 +45,10 @@ export default function RecordsPage() {
   ];
 
   const TYPES = [
-    { id: "EB", label: "苯甲酸雌二醇 (EB)", icon: Hexagon, ester: Ester.EB },
-    { id: "EV", label: "戊酸雌二醇 (EV)", icon: Loader, ester: Ester.EV },
-    { id: "EC", label: "环戊丙酸雌二醇 (EC)", icon: Orbit, ester: Ester.EC },
-    { id: "EN", label: "庚酸雌二醇 (EN)", icon: Network, ester: Ester.EN },
+    { id: "EB", label: t('records.types.EB'), icon: Hexagon, ester: Ester.EB },
+    { id: "EV", label: t('records.types.EV'), icon: Loader, ester: Ester.EV },
+    { id: "EC", label: t('records.types.EC'), icon: Orbit, ester: Ester.EC },
+    { id: "EN", label: t('records.types.EN'), icon: Network, ester: Ester.EN },
   ];
 
   const [records, setRecords] = useState<MedicationRecord[]>([]);
@@ -201,7 +201,7 @@ export default function RecordsPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t('records.current_input')}：{dosage || "0"} mg/天
+                    {t('records.current_input')}：{dosage || "0"} mg/{t('common.day', '天')}
                   </p>
                   <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
                     {t('records.ref_range')}

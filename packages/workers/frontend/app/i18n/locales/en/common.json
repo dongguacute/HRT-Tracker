@@ -21,6 +21,8 @@
     "confirm": "Confirm",
     "success": "Success",
     "error": "Error",
+    "day": "Day",
+    "loading": "Loading...",
     "disclaimer_clear": "This action will permanently delete all medication records, lab records, and personalized settings, and cannot be undone. It is recommended to export a data backup before proceeding.",
     "model_explanation_desc": "Understand the scientific principles of pharmacokinetic models",
     "github_repo_desc": "The source code repository for this project",
@@ -29,12 +31,69 @@
     "disclaimer_2": "2. Pharmacokinetics are greatly affected by individual differences (such as genes, age, health status, lifestyle, etc.), and there may be significant deviations between model estimates and actual blood test results.",
     "disclaimer_3": "3. It is strictly forbidden to adjust medication regimens based on the estimated data of this software. Any medication adjustment must be carried out under the guidance of a professional physician, combined with actual clinical manifestations and hospital blood test reports.",
     "disclaimer_4": "4. The developer is not responsible for any direct or indirect consequences arising from the use of this software or the information it provides.",
+    "account": {
+      "title": "Account Settings",
+      "info": "Account Info",
+      "manage_desc": "Manage your personal account settings",
+      "logout": "Logout",
+      "basic_info": "Basic Info",
+      "username": "Username",
+      "role": "Role",
+      "role_admin": "Admin",
+      "role_user": "User",
+      "security_settings": "Security Settings",
+      "admin_password_notice": "Admin password is managed by system environment variables. To manage other users, please go to the User Management Center.",
+      "go_to_user_management": "Go to User Management Center",
+      "change_password": "Change Password",
+      "old_password": "Old Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "password_mismatch": "Passwords do not match",
+      "change_success": "Password changed successfully",
+      "change_failed": "Failed to change password",
+      "invalid_old_password": "Incorrect old password"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "records": "Records",
       "calibration": "Calibration",
       "settings": "Settings",
       "account": "Account"
+    },
+    "body_params": {
+      "title": "Body Parameters",
+      "weight": "Weight (kg)",
+      "weight_desc": "Used for peak estimation in pharmacokinetic models"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "logging_in": "Logging in...",
+    "username": "Username",
+    "password": "Password",
+    "login_failed": "Login failed",
+    "network_error": "Network error, please try again later",
+    "please_login": "Please login to your account"
+  },
+  "admin": {
+    "users": {
+      "title": "User Management",
+      "manage_desc": "Create and manage regular user accounts",
+      "create_user": "New User",
+      "add_user": "Add User",
+      "username": "Username",
+      "password": "Password",
+      "new_password": "New Password",
+      "role": "Role",
+      "actions": "Actions",
+      "no_users": "No regular users",
+      "delete_confirm": "Are you sure you want to delete user {{username}}?",
+      "create_success": "User created successfully",
+      "delete_success": "User deleted successfully",
+      "password_updated": "Password for user {{username}} has been updated",
+      "fetch_failed": "Failed to fetch data",
+      "admin_only": "Only admins can access this page",
+      "network_error": "Network error"
     }
   },
   "home": {
@@ -102,6 +161,12 @@
       "Gel": "Gel",
       "Oral": "Oral",
       "Sublingual": "Sublingual"
+    },
+    "types": {
+      "EB": "Estradiol Benzoate (EB)",
+      "EV": "Estradiol Valerate (EV)",
+      "EC": "Estradiol Cypionate (EC)",
+      "EN": "Estradiol Enanthate (EN)"
     }
   },
   "calibration": {
