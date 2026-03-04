@@ -9,7 +9,8 @@ import {
   Upload, 
   ShieldAlert,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { settingsStorage, type Settings } from "../utils/storage";
@@ -17,6 +18,7 @@ import { settingsStorage, type Settings } from "../utils/storage";
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(settingsStorage.getSettings());
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleThemeChange = (theme: Settings['theme']) => {
     const updated = settingsStorage.saveSettings({ theme });
@@ -59,6 +61,10 @@ export default function SettingsPage() {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleClearData = () => {
+    settingsStorage.clearAllData();
   };
 
   return (
@@ -154,6 +160,44 @@ export default function SettingsPage() {
             导入失败，请检查文件格式。
           </motion.div>
         )}
+
+        <div className="pt-2">
+          {!showClearConfirm ? (
+            <button
+              onClick={() => setShowClearConfirm(true)}
+              className="w-full flex items-center justify-center gap-3 p-6 rounded-[32px] bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/10 transition-colors group"
+            >
+              <Trash2 className="w-6 h-6 text-red-400 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-400" />
+              <span className="font-bold text-red-600 dark:text-red-400">一键清空所有数据</span>
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-red-50 dark:bg-red-500/10 p-6 rounded-[32px] border-2 border-red-200 dark:border-red-500/20">
+                <div className="flex items-center gap-3 text-red-600 dark:text-red-400 mb-2">
+                  <AlertCircle className="w-6 h-6" />
+                  <span className="font-black text-lg">确认清空？</span>
+                </div>
+                <p className="text-red-700/70 dark:text-red-400/70 text-sm font-medium mb-6">
+                  此操作将永久删除所有用药记录、化验记录和个性化设置，且无法撤销。建议在操作前先导出数据备份。
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setShowClearConfirm(false)}
+                    className="py-4 px-6 rounded-2xl bg-white dark:bg-white/5 text-gray-600 dark:text-gray-400 font-bold hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleClearData}
+                    className="py-4 px-6 rounded-2xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-500/25"
+                  >
+                    确认清空
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* 免责声明 */}

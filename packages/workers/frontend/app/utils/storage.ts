@@ -86,6 +86,15 @@ export const settingsStorage = {
       console.error('Failed to import data', e);
       return false;
     }
+  },
+
+  clearAllData: () => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LAB_STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    // 重新加载页面以应用默认设置
+    window.location.reload();
   }
 };
 
