@@ -6,24 +6,32 @@ import {
   Settings, 
   UserCircle 
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../utils/cn";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "概览", to: "/" },
-  { icon: Calendar, label: "记录", to: "/records" },
-  { icon: Scale, label: "校准", to: "/calibration" },
-  { icon: Settings, label: "设置", to: "/settings" },
-  { icon: UserCircle, label: "账户", to: "/account" },
-];
-
 export function Sidebar() {
+  const { t, i18n } = useTranslation();
+  
+  const navItems = [
+    { icon: LayoutDashboard, label: t('common.nav.dashboard'), to: "/" },
+    { icon: Calendar, label: t('common.nav.records'), to: "/records" },
+    { icon: Scale, label: t('common.nav.calibration'), to: "/calibration" },
+    { icon: Settings, label: t('common.nav.settings'), to: "/settings" },
+    { icon: UserCircle, label: t('common.nav.account'), to: "/account" },
+  ];
+
   const currentTime = new Date();
-  const timeString = currentTime.toLocaleTimeString('zh-CN', { 
+  const timeString = currentTime.toLocaleTimeString(i18n.language, { 
     hour: '2-digit', 
     minute: '2-digit',
     hour12: false 
   });
-  const dateString = `${currentTime.getMonth() + 1}月${currentTime.getDate()}日`;
+  
+  const dateString = i18n.language.startsWith('zh') 
+    ? `${currentTime.getMonth() + 1}月${currentTime.getDate()}日`
+    : i18n.language === 'ja'
+    ? `${currentTime.getMonth() + 1}月${currentTime.getDate()}日`
+    : currentTime.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' });
 
   return (
     <aside className="w-64 h-screen flex flex-col bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05] p-6">

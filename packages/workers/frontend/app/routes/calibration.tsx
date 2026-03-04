@@ -18,6 +18,7 @@ import {
   Beaker,
   Info
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../utils/cn";
 import { labStorage, type LabRecord } from "../utils/storage";
 
@@ -27,6 +28,7 @@ const UNITS = [
 ];
 
 export default function CalibrationPage() {
+  const { t, i18n } = useTranslation();
   const [records, setRecords] = useState<LabRecord[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -109,8 +111,8 @@ export default function CalibrationPage() {
             <Beaker className="w-6 h-6 text-blue-400 dark:text-blue-300" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">检查记录 (校准)</h2>
-            <p className="text-sm text-gray-400 dark:text-gray-500">{records.length} 条记录</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('calibration.title')}</h2>
+            <p className="text-sm text-gray-400 dark:text-gray-500">{records.length} {t('records.count')}</p>
           </div>
         </div>
         <div className={cn(
@@ -137,7 +139,7 @@ export default function CalibrationPage() {
             className="bg-[#F2F7FA] dark:bg-card rounded-[32px] p-8 shadow-sm relative overflow-hidden"
           >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {editingId ? "编辑检查记录" : "新增检查记录"}
+              {editingId ? t('calibration.edit_record') : t('calibration.add_record')}
             </h2>
             
             <div className="space-y-6">
@@ -145,23 +147,23 @@ export default function CalibrationPage() {
               <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-2xl p-4 flex gap-3">
                 <Info className="w-5 h-5 text-blue-400 dark:text-blue-300 shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">为什么要添加检查记录？</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">{t('calibration.why_title')}</h4>
                   <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                    通过输入医院化验单上的雌二醇（E2）数值，系统可以根据你的个人代谢情况对模拟曲线进行自动校准，使预测结果更加准确。
+                    {t('calibration.why_desc')}
                   </p>
                 </div>
               </div>
 
               {/* Time Picker */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">抽血时间</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('calibration.blood_time')}</label>
                 <div className="relative">
                   <div 
                     onClick={() => setIsCalendarOpen(true)}
                     className="w-full bg-white dark:bg-white/[0.05] rounded-2xl p-4 flex items-center justify-between border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer"
                   >
                     <span className="text-lg font-medium text-gray-900 dark:text-white">
-                      {format(time, "EEE d MMM HH:mm", { locale: zhCN })}
+                      {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM HH:mm" : "EEE, MMM d, HH:mm", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                     </span>
                     <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
@@ -185,7 +187,7 @@ export default function CalibrationPage() {
                           <div className="flex flex-col gap-6">
                             <div className="flex items-baseline gap-3">
                               <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                {format(time, "EEE d MMM", { locale: zhCN })}
+                                {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM" : "EEE, MMM d", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                               </span>
                               <input
                                 type="time"
@@ -222,7 +224,7 @@ export default function CalibrationPage() {
                                     setTime(newDate);
                                   }
                                 }}
-                                locale={zhCN}
+                                locale={i18n.language === 'zh-CN' ? zhCN : undefined}
                                 classNames={{
                                   month_caption: "flex justify-center py-2 mb-4 relative items-center text-lg font-bold text-gray-900 dark:text-white",
                                   nav: "flex items-center",
@@ -254,13 +256,13 @@ export default function CalibrationPage() {
                                 className="flex-1 py-4 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 rounded-[24px] font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
                               >
                                 <X className="w-5 h-5" />
-                                取消
+                                {t('common.cancel')}
                               </button>
                               <button
                                 onClick={() => setIsCalendarOpen(false)}
                                 className="flex-1 py-4 bg-blue-500 dark:bg-blue-600 text-white rounded-[24px] font-bold hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors flex items-center justify-center"
                               >
-                                确定
+                                {t('common.confirm')}
                               </button>
                             </div>
                           </div>
@@ -273,7 +275,7 @@ export default function CalibrationPage() {
 
               {/* Value Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">雌二醇 (E2) 数值</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('calibration.e2_value')}</label>
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <input 
@@ -328,7 +330,7 @@ export default function CalibrationPage() {
                   className="px-8 py-4 bg-blue-500 dark:bg-blue-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-blue-600 dark:hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 dark:shadow-blue-900/20"
                 >
                   <Save className="w-5 h-5" />
-                  保存记录
+                  {t('calibration.save')}
                 </button>
               </div>
             </div>
@@ -340,13 +342,13 @@ export default function CalibrationPage() {
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400" />
-          历史检查记录
+          {t('calibration.history')}
         </h3>
         
         <div className="space-y-3">
           {records.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 dark:bg-white/[0.02] rounded-[32px] border-2 border-dashed border-gray-200 dark:border-white/10">
-              <p className="text-gray-400 dark:text-gray-500">暂无检查记录</p>
+              <p className="text-gray-400 dark:text-gray-500">{t('calibration.no_records')}</p>
             </div>
           ) : (
             <AnimatePresence initial={false}>

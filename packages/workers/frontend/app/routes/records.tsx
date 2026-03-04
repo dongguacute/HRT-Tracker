@@ -27,27 +27,30 @@ import {
   Info,
   Pencil
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../utils/cn";
 import { medicationStorage, type MedicationRecord } from "../utils/storage";
 import { Ester, Route } from "@hrt-tracker/core";
 
-const METHODS = [
-  { id: "Injection", label: "肌肉注射 (Injection)", icon: Syringe, color: "text-pink-500", route: Route.Injection },
-  { id: "Beta-Patch", label: "贴片贴上 (Beta)", icon: Bookmark, color: "text-orange-500", route: Route.PatchApply },
-  { id: "Beta-Remove", label: "贴片移除 (Beta)", icon: X, color: "text-gray-400", route: Route.PatchRemove },
-  { id: "Beta-Gel", label: "凝胶 (Beta)", icon: Droplets, color: "text-blue-400", route: Route.Gel },
-  { id: "Oral", label: "口服 (Oral)", icon: Pill, color: "text-blue-500", route: Route.Oral },
-  { id: "Sublingual", label: "舌下 (Sublingual)", icon: Pill, color: "text-emerald-500", route: Route.Sublingual },
-];
-
-const TYPES = [
-  { id: "EB", label: "苯甲酸雌二醇 (EB)", icon: Hexagon, ester: Ester.EB },
-  { id: "EV", label: "戊酸雌二醇 (EV)", icon: Loader, ester: Ester.EV },
-  { id: "EC", label: "环戊丙酸雌二醇 (EC)", icon: Orbit, ester: Ester.EC },
-  { id: "EN", label: "庚酸雌二醇 (EN)", icon: Network, ester: Ester.EN },
-];
-
 export default function RecordsPage() {
+  const { t, i18n } = useTranslation();
+  
+  const METHODS = [
+    { id: "Injection", label: `${t('records.methods.Injection')} (Injection)`, icon: Syringe, color: "text-pink-500", route: Route.Injection },
+    { id: "Beta-Patch", label: `${t('records.methods.Patch')} (Beta)`, icon: Bookmark, color: "text-orange-500", route: Route.PatchApply },
+    { id: "Beta-Remove", label: `${t('records.methods.Remove')} (Beta)`, icon: X, color: "text-gray-400", route: Route.PatchRemove },
+    { id: "Beta-Gel", label: `${t('records.methods.Gel')} (Beta)`, icon: Droplets, color: "text-blue-400", route: Route.Gel },
+    { id: "Oral", label: `${t('records.methods.Oral')} (Oral)`, icon: Pill, color: "text-blue-500", route: Route.Oral },
+    { id: "Sublingual", label: `${t('records.methods.Sublingual')} (Sublingual)`, icon: Pill, color: "text-emerald-500", route: Route.Sublingual },
+  ];
+
+  const TYPES = [
+    { id: "EB", label: "苯甲酸雌二醇 (EB)", icon: Hexagon, ester: Ester.EB },
+    { id: "EV", label: "戊酸雌二醇 (EV)", icon: Loader, ester: Ester.EV },
+    { id: "EC", label: "环戊丙酸雌二醇 (EC)", icon: Orbit, ester: Ester.EC },
+    { id: "EN", label: "庚酸雌二醇 (EN)", icon: Network, ester: Ester.EN },
+  ];
+
   const [records, setRecords] = useState<MedicationRecord[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -116,10 +119,10 @@ export default function RecordsPage() {
   };
 
   const getDosageLevel = (dosageValue: number) => {
-    if (dosageValue <= 1.5) return { label: "低剂量", color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" };
-    if (dosageValue <= 3.0) return { label: "中等剂量", color: "bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" };
-    if (dosageValue <= 6.0) return { label: "高剂量", color: "bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400" };
-    return { label: "超高剂量", color: "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400" };
+    if (dosageValue <= 1.5) return { label: t('home.dosage_levels.low'), color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" };
+    if (dosageValue <= 3.0) return { label: t('home.dosage_levels.medium'), color: "bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" };
+    if (dosageValue <= 6.0) return { label: t('home.dosage_levels.high'), color: "bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400" };
+    return { label: t('home.dosage_levels.very_high'), color: "bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400" };
   };
 
   const currentDosageLevel = getDosageLevel(parseFloat(dosage) || 0);
@@ -155,8 +158,8 @@ export default function RecordsPage() {
             <Activity className="w-6 h-6 text-pink-400 dark:text-pink-300" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">用药记录</h2>
-            <p className="text-sm text-gray-400 dark:text-gray-500">{records.length} 条记录</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('records.title')}</h2>
+            <p className="text-sm text-gray-400 dark:text-gray-500">{records.length} {t('records.count')}</p>
           </div>
         </div>
         <div className={cn(
@@ -183,7 +186,7 @@ export default function RecordsPage() {
             className="bg-[#F2F2F2] dark:bg-card rounded-[32px] p-8 shadow-sm relative overflow-hidden"
           >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-              {editingId ? "编辑用药记录" : "新增用药记录"}
+              {editingId ? t('records.edit_record') : t('records.add_record')}
             </h2>
             
             <div className="space-y-6">
@@ -192,29 +195,29 @@ export default function RecordsPage() {
                 <Info className="w-5 h-5 text-[#00A37B] dark:text-[#00c292] shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-gray-900 dark:text-white">剂量级别参考</h4>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{t('records.dosage_ref')}</h4>
                     <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold", currentDosageLevel.color)}>
                       {currentDosageLevel.label}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    当前输入剂量：{dosage || "0"} mg/天
+                    {t('records.current_input')}：{dosage || "0"} mg/天
                   </p>
                   <p className="text-[10px] text-gray-400 dark:text-gray-500 leading-relaxed">
-                    参考范围：低剂量 ≤ 1.5 mg/天 · 中等剂量 ≤ 3 mg/天 · 高剂量 ≤ 6 mg/天 · 超高剂量 ≤ 9 mg/天
+                    {t('records.ref_range')}
                   </p>
                 </div>
               </div>
               {/* Time Picker */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">给药时间</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('records.medication_time')}</label>
                 <div className="relative">
                   <div 
                     onClick={() => setIsCalendarOpen(true)}
                     className="w-full bg-white dark:bg-white/[0.05] rounded-2xl p-4 flex items-center justify-between border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer"
                   >
                     <span className="text-lg font-medium text-gray-900 dark:text-white">
-                      {format(time, "EEE d MMM HH:mm", { locale: zhCN })}
+                      {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM HH:mm" : "EEE, MMM d, HH:mm", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                     </span>
                     <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                   </div>
@@ -238,7 +241,7 @@ export default function RecordsPage() {
                           <div className="flex flex-col gap-6">
                             <div className="flex items-baseline gap-3">
                               <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                {format(time, "EEE d MMM", { locale: zhCN })}
+                                {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM" : "EEE, MMM d", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                               </span>
                               <input
                                 type="time"
@@ -275,7 +278,7 @@ export default function RecordsPage() {
                                     setTime(newDate);
                                   }
                                 }}
-                                locale={zhCN}
+                                locale={i18n.language === 'zh-CN' ? zhCN : undefined}
                                 classNames={{
                                   month_caption: "flex justify-center py-2 mb-4 relative items-center text-lg font-bold text-gray-900 dark:text-white",
                                   nav: "flex items-center",
@@ -307,13 +310,13 @@ export default function RecordsPage() {
                                 className="flex-1 py-4 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 rounded-[24px] font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
                               >
                                 <X className="w-5 h-5" />
-                                取消
+                                {t('common.cancel')}
                               </button>
                               <button
                                 onClick={() => setIsCalendarOpen(false)}
                                 className="flex-1 py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-[24px] font-bold hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-colors flex items-center justify-center"
                               >
-                                确定
+                                {t('common.confirm')}
                               </button>
                             </div>
                           </div>
@@ -326,7 +329,7 @@ export default function RecordsPage() {
 
               {/* Method Selector */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">给药途径</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('records.medication_method')}</label>
                 <div className="relative">
                   <button 
                     onClick={handleMethodToggle}
@@ -367,7 +370,7 @@ export default function RecordsPage() {
 
               {/* Drug Type Selector */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">药物类型</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('records.medication_type')}</label>
                 <div className="relative">
                   <button 
                     onClick={handleTypeToggle}
@@ -408,7 +411,7 @@ export default function RecordsPage() {
 
               {/* Dosage Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">药物剂量 (MG)</label>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('records.dosage_amount')}</label>
                 <div className="relative">
                   <input 
                     type="number"
@@ -424,45 +427,45 @@ export default function RecordsPage() {
               <div className="bg-[#FFF9E6] dark:bg-yellow-500/10 border border-[#FFD666]/30 dark:border-yellow-500/20 rounded-2xl p-4 flex gap-3">
                 <AlertTriangle className="w-5 h-5 text-[#FAAD14] shrink-0" />
                 <div>
-                  <h4 className="font-bold text-[#855800] dark:text-yellow-500">使用方式与用量</h4>
-                  <p className="text-sm text-[#855800] dark:text-yellow-500/80 opacity-80">乳腺癌高风险者、重度肝障碍患者请勿使用！</p>
+                  <h4 className="font-bold text-[#855800] dark:text-yellow-500">{t('records.usage_warning')}</h4>
+                  <p className="text-sm text-[#855800] dark:text-yellow-500/80 opacity-80">{t('records.usage_warning_desc')}</p>
                 </div>
               </div>
 
               {/* Info Sections */}
               <div className="bg-gray-100/50 dark:bg-white/[0.02] rounded-2xl p-6 space-y-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  使用方式：肌肉注射、皮下注射 <span className="text-pink-500 dark:text-pink-400 font-medium">不会打针就不要瞎打！</span>
+                  {t('records.usage_method')}：<span className="text-pink-500 dark:text-pink-400 font-medium">{t('records.injection_warning')}</span>
                 </p>
                 <div className="space-y-2">
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">使用剂量：</p>
+                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('records.usage_dosage')}：</p>
                   <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                    <li>戊酸雌二醇：每 5-7 天 5 mg / 每 1-2 周 10 mg</li>
-                    <li>环戊丙酸雌二醇：每 7 天 5-6 mg / 每 14 天 10-12 mg</li>
+                    <li>{t('records.ev_dosage')}</li>
+                    <li>{t('records.ec_dosage')}</li>
                   </ul>
                   <a href="https://transfemscience.org/misc/injectable-e2-simulator/" className="text-sm text-[#00A37B] dark:text-[#00c292] flex items-center gap-1 hover:underline">
-                    雌二醇注射剂模拟计算器 (英文) <ExternalLink className="w-3 h-3" />
+                    {t('records.simulator_link')} <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               </div>
 
               {/* Notes Section */}
               <div className="bg-gray-100/50 dark:bg-white/[0.02] rounded-2xl p-6 space-y-4">
-                <h4 className="font-bold text-gray-900 dark:text-white">注意事项：</h4>
+                <h4 className="font-bold text-gray-900 dark:text-white">{t('records.notes')}：</h4>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
-                  <li>• 请以正确的方式打开安瓿瓶，以避免被玻璃划伤 / 使瓶子碎裂 / 使微小的玻璃碎渣混入药水。</li>
-                  <li>• 请勿重复注入同一位置。</li>
-                  <li className="text-red-500 dark:text-red-400 font-medium">• 小心避开血管，可能栓塞血管！</li>
-                  <li className="text-red-500 dark:text-red-400 font-medium">• 小心避开神经，若进行肌肉注射，在安全区域内注射。</li>
-                  <li>• 由于药品为油性，建议使用 12 号针头 (粉, 18G) 抽取药品，6 号针头 (蓝, 23G / 25G) 注射。</li>
-                  <li>• 快速进针和抽药完毕后使用新针头注射有助于缓解疼痛。</li>
-                  <li>• 自行注射建议使用股外侧肌 (大腿三分之一中段斜外上方) 和三角肌 (打疫苗的位置)。</li>
-                  <li>• 如果您在插入注射针头时感到剧烈疼痛或看到大量血液回流，请立即拔出针头，更换新的针头并更换注射部位。</li>
-                  <li>• 如果在某次注射结束后有较以往更多出血 (但可以止住)，属于正常现象，请不要惊慌。</li>
+                  <li>• {t('records.note_1')}</li>
+                  <li>• {t('records.note_2')}</li>
+                  <li className="text-red-500 dark:text-red-400 font-medium">• {t('records.note_3')}</li>
+                  <li className="text-red-500 dark:text-red-400 font-medium">• {t('records.note_4')}</li>
+                  <li>• {t('records.note_5')}</li>
+                  <li>• {t('records.note_6')}</li>
+                  <li>• {t('records.note_7')}</li>
+                  <li>• {t('records.note_8')}</li>
+                  <li>• {t('records.note_9')}</li>
                 </ul>
                 <div className="pt-2 border-t border-gray-200 dark:border-white/10">
                   <a href="https://mtf.wiki" className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 hover:underline">
-                    来源: Mtf.wiki <ExternalLink className="w-3 h-3" />
+                    {t('records.source')}: Mtf.wiki <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
               </div>
@@ -474,7 +477,7 @@ export default function RecordsPage() {
                   className="px-8 py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-2xl font-bold flex items-center gap-2 hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-all shadow-lg shadow-[#00A37B]/20 dark:shadow-[#00c292]/10"
                 >
                   <Save className="w-5 h-5" />
-                  保存
+                  {t('records.save')}
                 </button>
               </div>
             </div>
@@ -486,13 +489,13 @@ export default function RecordsPage() {
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#00A37B] dark:bg-[#00c292]" />
-          历史记录
+          {t('records.history')}
         </h3>
         
         <div className="space-y-3">
           {records.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 dark:bg-white/[0.02] rounded-[32px] border-2 border-dashed border-gray-200 dark:border-white/10">
-              <p className="text-gray-400 dark:text-gray-500">暂无记录</p>
+              <p className="text-gray-400 dark:text-gray-500">{t('records.no_records')}</p>
             </div>
           ) : (
             <AnimatePresence initial={false}>

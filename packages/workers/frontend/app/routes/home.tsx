@@ -7,6 +7,7 @@ import {
   Info,
   AlertCircle
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../utils/cn";
 import { medicationStorage, labStorage, settingsStorage } from "../utils/storage";
 import { runSimulation, Ester, Route, type DoseEvent, createCalibrationInterpolator, type LabResult as CoreLabResult, interpolateConcentration } from "@hrt-tracker/core";
@@ -30,6 +31,7 @@ const TYPES = [
 ];
 
 export default function Home() {
+  const { t, i18n } = useTranslation();
   const [records, setRecords] = useState<any[]>([]);
   const [labRecords, setLabRecords] = useState<any[]>([]);
 
@@ -191,19 +193,19 @@ export default function Home() {
 
     return simulationResult.timeH.map((t: number, i: number) => ({
       time: t,
-      displayTime: format(addDays(baseTime, t / 24), "M月d日 HH:mm"),
+      displayTime: format(addDays(baseTime, t / 24), i18n.language.startsWith('zh') || i18n.language === 'ja' ? "M月d日 HH:mm" : "MMM d, HH:mm"),
       e2: Math.round(finalConc_E2[i] || 0),
       cpa: Math.round(simulationResult.concPGmL_CPA[i] || 0),
     }));
-  }, [simulationResult, labRecords]);
+  }, [simulationResult, labRecords, i18n.language]);
 
   const currentE2 = simulationData.length > 0 ? simulationData.find((d: any) => d.time >= 0)?.e2 || 0 : 0;
 
   const getDosageLevel = (dosageValue: number) => {
-    if (dosageValue <= 1.5) return { label: "低剂量", color: "bg-emerald-50 text-emerald-400" };
-    if (dosageValue <= 3.0) return { label: "中等剂量", color: "bg-blue-50 text-blue-400" };
-    if (dosageValue <= 6.0) return { label: "高剂量", color: "bg-orange-50 text-orange-400" };
-    return { label: "超高剂量", color: "bg-red-50 text-red-400" };
+    if (dosageValue <= 1.5) return { label: t('home.dosage_levels.low'), color: "bg-emerald-50 text-emerald-400" };
+    if (dosageValue <= 3.0) return { label: t('home.dosage_levels.medium'), color: "bg-blue-50 text-blue-400" };
+    if (dosageValue <= 6.0) return { label: t('home.dosage_levels.high'), color: "bg-orange-50 text-orange-400" };
+    return { label: t('home.dosage_levels.very_high'), color: "bg-red-50 text-red-400" };
   };
 
   // 获取最近一次用药的剂量级别
@@ -211,7 +213,7 @@ export default function Home() {
     if (records.length === 0) return null;
     const latestRecord = records[0]; // records 已经是按时间倒序排列的
     return getDosageLevel(latestRecord.dosage);
-  }, [records]);
+  }, [records, t]);
 
   const chartOption = useMemo(() => {
     if (simulationData.length === 0) return {};
@@ -243,7 +245,7 @@ export default function Home() {
             <div style="margin-bottom: 4px; color: ${isDark ? '#9ca3af' : '#6b7280'}; font-size: 12px;">${data.name}</div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f472b6;"></div>
-              <span style="font-size: 14px; color: ${isDark ? '#e5e7eb' : '#374151'};">雌二醇: <span style="font-size: 18px; color: #f472b6; font-weight: 900;">${data.value}</span> <span style="font-size: 10px; color: ${isDark ? '#6b7280' : '#9ca3af'};">pg/mL</span></span>
+              <span style="font-size: 14px; color: ${isDark ? '#e5e7eb' : '#374151'};">${t('home.estradiol')}: <span style="font-size: 18px; color: #f472b6; font-weight: 900;">${data.value}</span> <span style="font-size: 10px; color: ${isDark ? '#6b7280' : '#9ca3af'};">pg/mL</span></span>
             </div>
           `;
         }
@@ -307,7 +309,7 @@ export default function Home() {
       ],
       series: [
         {
-          name: '雌二醇',
+          name: t('home.estradiol'),
           type: 'line',
           smooth: true,
           showSymbol: false,
@@ -351,7 +353,7 @@ export default function Home() {
         }
       ]
     };
-  }, [simulationData, isDark]);
+  }, [simulationData, isDark, t]);
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-8">
@@ -363,12 +365,12 @@ export default function Home() {
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">当前估算血药浓度</span>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('home.current_conc')}</span>
             <button 
               onClick={() => setShowNotice(true)}
               className="flex items-center gap-1 px-2 py-0.5 bg-red-50 dark:bg-red-500/10 text-red-400 dark:text-red-400 rounded-full text-[10px] font-bold hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors cursor-pointer"
             >
-              <Info className="w-3 h-3" /> 重要提示
+              <Info className="w-3 h-3" /> {t('home.important_notice')}
             </button>
           </div>
           {latestDosageLevel && (
@@ -382,7 +384,7 @@ export default function Home() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-pink-400" />
-              <span className="text-sm font-bold text-gray-900 dark:text-white">雌二醇</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">{t('home.estradiol')}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-5xl font-black text-gray-900 dark:text-white">{currentE2}</span>
@@ -391,7 +393,7 @@ export default function Home() {
             {labRecords.length > 0 && (
               <div className="mt-2 space-y-1">
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">校准倍率</span>
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t('home.calibration_ratio')}</span>
                   <span className={cn(
                     "text-xs font-black px-1.5 py-0.5 rounded-md",
                     currentCalibrationRatio.ratio > 1.2 ? "bg-orange-50 dark:bg-orange-500/10 text-orange-500" : 
@@ -401,7 +403,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
-                  最近血检: {currentCalibrationRatio.actual} pg/mL (理论: {Math.round(currentCalibrationRatio.theory)} pg/mL)
+                  {t('home.latest_lab')}: {currentCalibrationRatio.actual} pg/mL ({t('home.theory')}: {Math.round(currentCalibrationRatio.theory)} pg/mL)
                 </div>
               </div>
             )}
@@ -410,7 +412,7 @@ export default function Home() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-purple-500" />
-              <span className="text-sm font-bold text-gray-900 dark:text-white">醋酸环丙孕酮</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">{t('home.cpa')}</span>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-5xl font-black text-gray-200 dark:text-white/10">--</span>
@@ -433,7 +435,7 @@ export default function Home() {
             <div className="w-10 h-10 rounded-2xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
               <Activity className="w-5 h-5 text-pink-400 dark:text-pink-300" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">血药浓度</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('home.blood_conc')}</h3>
           </div>
           <button className="p-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors text-gray-400 dark:text-gray-500">
             <RotateCcw className="w-5 h-5" />
@@ -441,9 +443,9 @@ export default function Home() {
         </div>
 
         <div className="h-[400px] w-full">
-          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-gray-400">加载图表中...</div>}>
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-gray-400">{t('home.loading_chart')}</div>}>
             {isLoading ? (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">计算模拟数据中...</div>
+              <div className="w-full h-full flex items-center justify-center text-gray-400">{t('home.calculating')}</div>
             ) : (
               <ReactECharts 
                 option={chartOption} 
@@ -478,21 +480,21 @@ export default function Home() {
                   <AlertCircle className="w-8 h-8 text-red-400 dark:text-red-400" />
                 </div>
                 
-                <h2 className="text-2xl font-black text-gray-900 dark:text-white">重要提示</h2>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white">{t('home.notice_modal.title')}</h2>
                 
                 <div className="space-y-4">
                   <p className="text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
-                    近期有用户反馈，参考血检结果进行校准后，估算数据出现异常偏差。
+                    {t('home.notice_modal.p1')}
                   </p>
                   
                   <div className="bg-white/60 dark:bg-white/5 border border-pink-100 dark:border-pink-500/20 rounded-[32px] p-6 text-left">
                     <p className="text-gray-900 dark:text-white font-bold leading-relaxed">
-                      请务必理解：本软件仅依据药代动力学模型提供理论估算值，无法替代真实的血液检测。同一个个体在不同时期的吸收代谢情况也可能发生变化。
+                      {t('home.notice_modal.p2')}
                     </p>
                   </div>
                   
                   <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed px-2">
-                    要准确了解您的血药浓度，唯一的途径是前往医院进行血检。请始终以医院检查报告作为调整用药的依据，切勿仅依赖本软件的估算值。
+                    {t('home.notice_modal.p3')}
                   </p>
                 </div>
 
@@ -500,7 +502,7 @@ export default function Home() {
                   onClick={handleConfirmNotice}
                   className="w-full py-5 bg-[#4A9488] dark:bg-[#00c292] text-white dark:text-black rounded-[24px] font-bold text-lg hover:bg-[#3D7A70] dark:hover:bg-[#00e0a8] transition-all active:scale-[0.98] shadow-lg shadow-[#4A9488]/20 dark:shadow-[#00c292]/10 mt-4"
                 >
-                  确定
+                  {t('common.confirm')}
                 </button>
               </div>
             </motion.div>

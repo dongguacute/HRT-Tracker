@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { useEffect, Suspense, lazy } from "react";
+import "./i18n/config";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -16,7 +17,11 @@ const Sidebar = lazy(() => import("./components/sidebar").then(m => ({ default: 
 
 export const links: Route.LinksFunction = () => [];
 
+import { useTranslation } from "react-i18next";
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { i18n } = useTranslation();
+  
   useEffect(() => {
     // 监听系统主题变化
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -67,7 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={i18n.language} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
