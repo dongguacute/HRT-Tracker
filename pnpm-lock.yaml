@@ -75,9 +75,18 @@ importers:
       '@hrt-tracker/core':
         specifier: workspace:*
         version: link:../../core
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
       hono:
         specifier: ^4.7.2
         version: 4.12.2
+      hono-sessions:
+        specifier: ^0.8.1
+        version: 0.8.1(hono@4.12.2)
+      jose:
+        specifier: ^6.1.3
+        version: 6.1.3
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250214.0
@@ -3312,6 +3321,10 @@ packages:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
+  dotenv@17.3.1:
+    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -3738,6 +3751,11 @@ packages:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
     engines: {node: '>=0.10.0'}
 
+  hono-sessions@0.8.1:
+    resolution: {integrity: sha512-YLSKuIP13yhXTQe2x3sCc1JWsqt1Z3WZB2DWE+oX+YpOsC3lv8uCHnCoNHcY9DPyflDw4XQJN+MFVvcp5QwWdw==}
+    peerDependencies:
+      hono: ^4.0.0
+
   hono@4.12.2:
     resolution: {integrity: sha512-gJnaDHXKDayjt8ue0n8Gs0A007yKXj4Xzb8+cNjZeYsSzzwKc0Lr+OZgYwVfB0pHfUs17EPoLvrOsEaJ9mj+Tg==}
     engines: {node: '>=16.9.0'}
@@ -3842,6 +3860,9 @@ packages:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
 
+  iron-webcrypto@1.2.1:
+    resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
+
   is-arrayish@0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
 
@@ -3931,6 +3952,9 @@ packages:
   jiti@2.6.1:
     resolution: {integrity: sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==}
     hasBin: true
+
+  jose@6.1.3:
+    resolution: {integrity: sha512-0TpaTfihd4QMNwrz/ob2Bp7X04yuxJkjRGi4aKmOqwhov54i6u79oCv7T+C7lo70MKH6BesI3vscD1yb/yzKXQ==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -8736,6 +8760,8 @@ snapshots:
 
   dotenv@16.4.7: {}
 
+  dotenv@17.3.1: {}
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -9258,6 +9284,12 @@ snapshots:
     dependencies:
       parse-passwd: 1.0.0
 
+  hono-sessions@0.8.1(hono@4.12.2):
+    dependencies:
+      hono: 4.12.2
+      iron-webcrypto: 1.2.1
+      ohash: 2.0.11
+
   hono@4.12.2: {}
 
   html-encoding-sniffer@3.0.0:
@@ -9379,6 +9411,8 @@ snapshots:
 
   ipaddr.js@1.9.1: {}
 
+  iron-webcrypto@1.2.1: {}
+
   is-arrayish@0.2.1: {}
 
   is-arrayish@0.3.4:
@@ -9448,6 +9482,8 @@ snapshots:
   jiti@2.4.2: {}
 
   jiti@2.6.1: {}
+
+  jose@6.1.3: {}
 
   js-tokens@4.0.0: {}
 

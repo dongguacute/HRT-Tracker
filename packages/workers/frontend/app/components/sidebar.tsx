@@ -4,19 +4,34 @@ import {
   Calendar, 
   Scale, 
   Settings, 
-  UserCircle 
+  UserCircle,
+  Users
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../utils/cn";
+import { useEffect, useState } from "react";
 
 export function Sidebar() {
   const { t, i18n } = useTranslation();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(res => res.json())
+      .then(data => {
+        if (data.user?.role === 'admin') {
+          setIsAdmin(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
   
   const navItems = [
     { icon: LayoutDashboard, label: t('common.nav.dashboard'), to: "/" },
     { icon: Calendar, label: t('common.nav.records'), to: "/records" },
     { icon: Scale, label: t('common.nav.calibration'), to: "/calibration" },
     { icon: Settings, label: t('common.nav.settings'), to: "/settings" },
+    ...(isAdmin ? [{ icon: Users, label: "用户管理", to: "/users" }] : []),
     { icon: UserCircle, label: t('common.nav.account'), to: "/account" },
   ];
 

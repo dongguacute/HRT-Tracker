@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "@hrt-tracker/core": "workspace:*",
-    "hono": "^4.7.2"
+    "dotenv": "^17.3.1",
+    "hono": "^4.7.2",
+    "hono-sessions": "^0.8.1",
+    "jose": "^6.1.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
