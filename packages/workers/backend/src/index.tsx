@@ -5,6 +5,7 @@ import { config } from 'dotenv'
 import { resolve } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import * as argon2 from 'argon2'
+import { authMiddleware, adminMiddleware } from './middleware/auth'
 
 // 加载根目录的 .env 文件
 config({ path: resolve(process.cwd(), '../../.env') })
@@ -105,20 +106,6 @@ const getUserDataLayer = (c: Context<any>) => {
   }
 }
 
-// 鉴权中间件
-const authMiddleware = async (c: Context<any>, next: Next) => {
-  const token = getCookie(c, 'auth_token')
-  if (!token) return c.json({ error: 'Unauthorized' }, 401)
-  
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    c.set('user', payload)
-    await next()
-  } catch (e) {
-    return c.json({ error: 'Invalid token' }, 401)
-  }
-}
-
 // 登录接口
 app.post('/auth/login', async (c) => {
   const { username, password } = await c.req.json()
@@ -136,10 +123,11 @@ app.post('/auth/login', async (c) => {
   } else {
     const storage = getUserDataLayer(c)
     const storedUser = await storage.getUser(username)
+    // 确保 storedUser 存在且密码匹配，并且角色必须是 'user'，防止普通用户存储中混入伪造的 admin
     if (storedUser && await argon2.verify(storedUser.password, password)) {
       user = { 
         username: storedUser.username, 
-        role: (storedUser.role === 'admin' ? 'admin' : 'user')
+        role: 'user' // 强制设为 user，所有 admin 必须通过环境变量定义
       }
     }
   }
@@ -175,12 +163,7 @@ app.get('/auth/me', authMiddleware, (c) => {
 })
 
 // 管理员接口：创建用户
-app.post('/admin/users', authMiddleware, async (c) => {
-  const currentUser = c.get('user')
-  if (currentUser.role !== 'admin') {
-    return c.json({ error: 'Forbidden' }, 403)
-  }
-
+app.post('/admin/users', authMiddleware, adminMiddleware, async (c) => {
   const { username, password } = await c.req.json()
   const storage = getUserDataLayer(c)
   
@@ -194,12 +177,7 @@ app.post('/admin/users', authMiddleware, async (c) => {
 })
 
 // 管理员接口：修改用户密码
-app.patch('/admin/users/:username', authMiddleware, async (c) => {
-  const currentUser = c.get('user')
-  if (currentUser.role !== 'admin') {
-    return c.json({ error: 'Forbidden' }, 403)
-  }
-
+app.patch('/admin/users/:username', authMiddleware, adminMiddleware, async (c) => {
   const targetUsername = c.req.param('username')
   const { password } = await c.req.json()
 
@@ -210,6 +188,7 @@ app.patch('/admin/users/:username', authMiddleware, async (c) => {
     return c.json({ error: 'User not found' }, 404)
   }
 
+  // 禁止管理员修改其他管理员的密码（如果存在多个管理员）
   if (user.role === 'admin') {
     return c.json({ error: 'Cannot modify admin password via this API' }, 403)
   }
@@ -269,12 +248,7 @@ app.post('/user/sync', authMiddleware, async (c) => {
 })
 
 // 管理员接口：删除用户
-app.delete('/admin/users/:username', authMiddleware, async (c) => {
-  const currentUser = c.get('user')
-  if (currentUser.role !== 'admin') {
-    return c.json({ error: 'Forbidden' }, 403)
-  }
-
+app.delete('/admin/users/:username', authMiddleware, adminMiddleware, async (c) => {
   const targetUsername = c.req.param('username')
   const storage = getUserDataLayer(c)
   const user = await storage.getUser(targetUsername)
@@ -291,12 +265,7 @@ app.delete('/admin/users/:username', authMiddleware, async (c) => {
   return c.json({ success: true })
 })
 
-app.get('/admin/users', authMiddleware, async (c) => {
-  const currentUser = c.get('user')
-  if (currentUser.role !== 'admin') {
-    return c.json({ error: 'Forbidden' }, 403)
-  }
-  
+app.get('/admin/users', authMiddleware, adminMiddleware, async (c) => {
   const storage = getUserDataLayer(c)
   const users = await storage.getUsers()
   
