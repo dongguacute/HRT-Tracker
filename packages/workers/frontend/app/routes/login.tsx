@@ -42,18 +42,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-8">
+      <div className="max-w-md w-full space-y-6 md:space-y-8 bg-white dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center rounded-xl mb-4">
             <LogIn className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">HRT Tracker</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">HRT Tracker</h2>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t('auth.please_login')}</p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="space-y-4">
+        <form className="mt-6 md:mt-8 space-y-4 md:space-y-6" onSubmit={handleLogin}>
+          <div className="space-y-3 md:space-y-4">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <User className="h-5 w-5 text-gray-400" />

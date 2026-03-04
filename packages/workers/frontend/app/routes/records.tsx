@@ -138,7 +138,7 @@ export default function RecordsPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6 md:space-y-8">
       {/* Header / Trigger Button */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -151,25 +151,25 @@ export default function RecordsPage() {
             setShowAddForm(true);
           }
         }}
-        className="bg-white dark:bg-card rounded-[32px] p-6 shadow-sm border border-gray-100 dark:border-white/[0.05] flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+        className="bg-white dark:bg-card rounded-[24px] md:rounded-[32px] p-4 md:p-6 shadow-sm border border-gray-100 dark:border-white/[0.05] flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
-            <Activity className="w-6 h-6 text-pink-400 dark:text-pink-300" />
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
+            <Activity className="w-5 h-5 md:w-6 md:h-6 text-pink-400 dark:text-pink-300" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('records.title')}</h2>
-            <p className="text-sm text-gray-400 dark:text-gray-500">{records.length} {t('records.count')}</p>
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">{t('records.title')}</h2>
+            <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500">{records.length} {t('records.count')}</p>
           </div>
         </div>
         <div className={cn(
-          "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300",
+          "w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-colors duration-300",
           (showAddForm || editingId) ? "bg-pink-50 dark:bg-pink-500/10" : "bg-[#E6F6F2] dark:bg-[#00A37B]/10"
         )}>
           {(showAddForm || editingId) ? (
-            <X className="w-6 h-6 text-pink-400 dark:text-pink-300" />
+            <X className="w-5 h-5 md:w-6 md:h-6 text-pink-400 dark:text-pink-300" />
           ) : (
-            <Plus className="w-6 h-6 text-[#00A37B] dark:text-[#00c292]" />
+            <Plus className="w-5 h-5 md:w-6 md:h-6 text-[#00A37B] dark:text-[#00c292]" />
           )}
         </div>
       </motion.div>
@@ -183,9 +183,9 @@ export default function RecordsPage() {
             animate={{ opacity: 1, height: "auto", y: 0 }}
             exit={{ opacity: 0, height: 0, y: -20 }}
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
-            className="bg-[#F2F2F2] dark:bg-card rounded-[32px] p-8 shadow-sm relative overflow-hidden"
+            className="bg-[#F2F2F2] dark:bg-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 shadow-sm relative overflow-hidden"
           >
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-6">
               {editingId ? t('records.edit_record') : t('records.add_record')}
             </h2>
             
@@ -194,9 +194,9 @@ export default function RecordsPage() {
               <div className="bg-[#E6F6F2] dark:bg-[#00A37B]/10 border border-[#00A37B]/10 dark:border-[#00A37B]/20 rounded-2xl p-4 flex gap-3">
                 <Info className="w-5 h-5 text-[#00A37B] dark:text-[#00c292] shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h4 className="font-bold text-gray-900 dark:text-white">{t('records.dosage_ref')}</h4>
-                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold", currentDosageLevel.color)}>
+                    <span className={cn("px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold", currentDosageLevel.color)}>
                       {currentDosageLevel.label}
                     </span>
                   </div>
@@ -216,7 +216,7 @@ export default function RecordsPage() {
                     onClick={() => setIsCalendarOpen(true)}
                     className="w-full bg-white dark:bg-white/[0.05] rounded-2xl p-4 flex items-center justify-between border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer"
                   >
-                    <span className="text-lg font-medium text-gray-900 dark:text-white">
+                    <span className="text-base md:text-lg font-medium text-gray-900 dark:text-white">
                       {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM HH:mm" : "EEE, MMM d, HH:mm", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                     </span>
                     <CalendarIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -236,22 +236,22 @@ export default function RecordsPage() {
                           initial={{ opacity: 0, scale: 0.9, y: 20 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#121212] rounded-[40px] p-8 shadow-2xl z-101 w-[90%] max-w-[400px] border dark:border-white/10"
+                          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#121212] rounded-[32px] md:rounded-[40px] p-6 md:p-8 shadow-2xl z-101 w-[90%] max-w-[400px] border dark:border-white/10"
                         >
                           <div className="flex flex-col gap-6">
-                            <div className="flex items-baseline gap-3">
-                              <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                            <div className="flex flex-wrap items-baseline gap-3">
+                              <span className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                                 {format(time, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "EEE d MMM" : "EEE, MMM d", { locale: i18n.language === 'zh-CN' ? zhCN : undefined })}
                               </span>
                               <input
                                 type="time"
                                 value={format(time, "HH:mm")}
                                 onChange={handleTimeChange}
-                                className="text-3xl font-bold text-gray-400 dark:text-gray-500 bg-transparent border-none focus:outline-none focus:text-gray-900 dark:focus:text-white w-24"
+                                className="text-2xl md:text-3xl font-bold text-gray-400 dark:text-gray-500 bg-transparent border-none focus:outline-none focus:text-gray-900 dark:focus:text-white w-24"
                               />
                             </div>
 
-                            <div className="calendar-container">
+                            <div className="calendar-container overflow-x-auto">
                               <style>{`
                                 .rdp-root {
                                   --rdp-accent-color: #00A37B;
@@ -288,7 +288,7 @@ export default function RecordsPage() {
                                   weekdays: "flex justify-between mb-2",
                                   weekday: "text-gray-400 dark:text-gray-500 rounded-md w-9 font-medium text-[0.8rem] uppercase text-center",
                                   week: "flex w-full justify-between mt-2",
-                                  day: "h-10 w-10 text-center text-sm p-0 relative flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors dark:text-gray-300",
+                                  day: "h-9 w-9 md:h-10 md:w-10 text-center text-sm p-0 relative flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors dark:text-gray-300",
                                   selected: "bg-[#00A37B] text-white hover:bg-[#008F6B] focus:bg-[#00A37B]",
                                   today: "text-[#00A37B] dark:text-[#00c292] font-bold",
                                   outside: "text-gray-300 dark:text-gray-600 opacity-50",
@@ -307,14 +307,14 @@ export default function RecordsPage() {
                             <div className="flex gap-4 mt-2">
                               <button
                                 onClick={() => setIsCalendarOpen(false)}
-                                className="flex-1 py-4 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 rounded-[24px] font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
+                                className="flex-1 py-3 md:py-4 bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 rounded-[20px] md:rounded-[24px] font-bold hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
                               >
                                 <X className="w-5 h-5" />
                                 {t('common.cancel')}
                               </button>
                               <button
                                 onClick={() => setIsCalendarOpen(false)}
-                                className="flex-1 py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-[24px] font-bold hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-colors flex items-center justify-center"
+                                className="flex-1 py-3 md:py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-[20px] md:rounded-[24px] font-bold hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-colors flex items-center justify-center"
                               >
                                 {t('common.confirm')}
                               </button>
@@ -336,7 +336,7 @@ export default function RecordsPage() {
                     className="w-full bg-white dark:bg-white/[0.05] rounded-2xl p-4 flex items-center gap-3 border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all text-left"
                   >
                     <selectedMethod.icon className={cn("w-5 h-5", selectedMethod.color)} />
-                    <span className="text-lg font-medium text-gray-900 dark:text-white flex-1">{selectedMethod.label}</span>
+                    <span className="text-base md:text-lg font-medium text-gray-900 dark:text-white flex-1">{selectedMethod.label}</span>
                     <ChevronDown className={cn("w-5 h-5 text-gray-400 dark:text-gray-500 transition-transform", isMethodOpen && "rotate-180")} />
                   </button>
                   
@@ -358,7 +358,7 @@ export default function RecordsPage() {
                             className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left"
                           >
                             <m.icon className={cn("w-5 h-5", m.color)} />
-                            <span className="text-lg font-medium text-gray-900 dark:text-white flex-1">{m.label}</span>
+                            <span className="text-base md:text-lg font-medium text-gray-900 dark:text-white flex-1">{m.label}</span>
                             {selectedMethod.id === m.id && <Check className="w-5 h-5 text-[#00A37B] dark:text-[#00c292]" />}
                           </button>
                         ))}
@@ -377,7 +377,7 @@ export default function RecordsPage() {
                     className="w-full bg-white dark:bg-white/[0.05] rounded-2xl p-4 flex items-center gap-3 border border-transparent hover:border-gray-200 dark:hover:border-white/10 transition-all text-left"
                   >
                     <selectedType.icon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                    <span className="text-lg font-medium text-gray-900 dark:text-white flex-1">{selectedType.label}</span>
+                    <span className="text-base md:text-lg font-medium text-gray-900 dark:text-white flex-1">{selectedType.label}</span>
                     <ChevronDown className={cn("w-5 h-5 text-gray-400 dark:text-gray-500 transition-transform", isTypeOpen && "rotate-180")} />
                   </button>
 
@@ -399,7 +399,7 @@ export default function RecordsPage() {
                             className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors text-left"
                           >
                             <t.icon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                            <span className="text-lg font-medium text-gray-900 dark:text-white flex-1">{t.label}</span>
+                            <span className="text-base md:text-lg font-medium text-gray-900 dark:text-white flex-1">{t.label}</span>
                             {selectedType.id === t.id && <Check className="w-5 h-5 text-[#00A37B] dark:text-[#00c292]" />}
                           </button>
                         ))}
@@ -417,56 +417,9 @@ export default function RecordsPage() {
                     type="number"
                     value={dosage}
                     onChange={(e) => setDosage(e.target.value)}
-                    className="w-full bg-gray-200/50 dark:bg-white/[0.05] rounded-2xl p-6 text-2xl font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00A37B]/20 transition-all"
+                    className="w-full bg-gray-200/50 dark:bg-white/[0.05] rounded-2xl p-4 md:p-6 text-xl md:text-2xl font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00A37B]/20 transition-all"
                     placeholder="0.0"
                   />
-                </div>
-              </div>
-
-              {/* Warning Box */}
-              <div className="bg-[#FFF9E6] dark:bg-yellow-500/10 border border-[#FFD666]/30 dark:border-yellow-500/20 rounded-2xl p-4 flex gap-3">
-                <AlertTriangle className="w-5 h-5 text-[#FAAD14] shrink-0" />
-                <div>
-                  <h4 className="font-bold text-[#855800] dark:text-yellow-500">{t('records.usage_warning')}</h4>
-                  <p className="text-sm text-[#855800] dark:text-yellow-500/80 opacity-80">{t('records.usage_warning_desc')}</p>
-                </div>
-              </div>
-
-              {/* Info Sections */}
-              <div className="bg-gray-100/50 dark:bg-white/[0.02] rounded-2xl p-6 space-y-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('records.usage_method')}：<span className="text-pink-500 dark:text-pink-400 font-medium">{t('records.injection_warning')}</span>
-                </p>
-                <div className="space-y-2">
-                  <p className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('records.usage_dosage')}：</p>
-                  <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
-                    <li>{t('records.ev_dosage')}</li>
-                    <li>{t('records.ec_dosage')}</li>
-                  </ul>
-                  <a href="https://transfemscience.org/misc/injectable-e2-simulator/" className="text-sm text-[#00A37B] dark:text-[#00c292] flex items-center gap-1 hover:underline">
-                    {t('records.simulator_link')} <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Notes Section */}
-              <div className="bg-gray-100/50 dark:bg-white/[0.02] rounded-2xl p-6 space-y-4">
-                <h4 className="font-bold text-gray-900 dark:text-white">{t('records.notes')}：</h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
-                  <li>• {t('records.note_1')}</li>
-                  <li>• {t('records.note_2')}</li>
-                  <li className="text-red-500 dark:text-red-400 font-medium">• {t('records.note_3')}</li>
-                  <li className="text-red-500 dark:text-red-400 font-medium">• {t('records.note_4')}</li>
-                  <li>• {t('records.note_5')}</li>
-                  <li>• {t('records.note_6')}</li>
-                  <li>• {t('records.note_7')}</li>
-                  <li>• {t('records.note_8')}</li>
-                  <li>• {t('records.note_9')}</li>
-                </ul>
-                <div className="pt-2 border-t border-gray-200 dark:border-white/10">
-                  <a href="https://mtf.wiki" className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 hover:underline">
-                    {t('records.source')}: Mtf.wiki <ExternalLink className="w-3 h-3" />
-                  </a>
                 </div>
               </div>
 
@@ -474,7 +427,7 @@ export default function RecordsPage() {
               <div className="flex items-center justify-end pt-4">
                 <button 
                   onClick={handleSave}
-                  className="px-8 py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-2xl font-bold flex items-center gap-2 hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-all shadow-lg shadow-[#00A37B]/20 dark:shadow-[#00c292]/10"
+                  className="w-full md:w-auto px-8 py-4 bg-[#00A37B] dark:bg-[#00c292] text-white dark:text-black rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#008F6B] dark:hover:bg-[#00e0a8] transition-all shadow-lg shadow-[#00A37B]/20 dark:shadow-[#00c292]/10"
                 >
                   <Save className="w-5 h-5" />
                   {t('records.save')}
@@ -494,7 +447,7 @@ export default function RecordsPage() {
         
         <div className="space-y-3">
           {records.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 dark:bg-white/[0.02] rounded-[32px] border-2 border-dashed border-gray-200 dark:border-white/10">
+            <div className="text-center py-12 bg-gray-50 dark:bg-white/[0.02] rounded-[24px] md:rounded-[32px] border-2 border-dashed border-gray-200 dark:border-white/10">
               <p className="text-gray-400 dark:text-gray-500">{t('records.no_records')}</p>
             </div>
           ) : (
@@ -512,36 +465,36 @@ export default function RecordsPage() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, x: -20 }}
                     transition={{ type: "spring", stiffness: 500, damping: 30, mass: 1 }}
-                    className="bg-white dark:bg-card border border-gray-100 dark:border-white/[0.05] rounded-3xl p-6 flex items-center gap-4 hover:shadow-md transition-shadow group"
+                    className="bg-white dark:bg-card border border-gray-100 dark:border-white/[0.05] rounded-[24px] md:rounded-3xl p-4 md:p-6 flex items-center gap-3 md:gap-4 hover:shadow-md transition-shadow group"
                   >
-                    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5", method.color.replace('text-', 'bg-').replace('500', '50').replace('400', '400/10'))}>
-                      <method.icon className={cn("w-6 h-6", method.color)} />
+                    <div className={cn("w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center bg-gray-50 dark:bg-white/5 shrink-0", method.color.replace('text-', 'bg-').replace('500', '50').replace('400', '400/10'))}>
+                      <method.icon className={cn("w-5 h-5 md:w-6 md:h-6", method.color)} />
                     </div>
                     
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <type.icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                          <h4 className="font-bold text-gray-900 dark:text-white">{type.label.split(' ')[0]} ({record.type})</h4>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <type.icon className="w-3 h-3 md:w-4 md:h-4 text-gray-400 dark:text-gray-500 shrink-0" />
+                          <h4 className="font-bold text-sm md:text-base text-gray-900 dark:text-white truncate">{type.label.split(' ')[0]} ({record.type})</h4>
                         </div>
-                        <span className="text-sm text-gray-400 dark:text-gray-500 font-medium">
+                        <span className="text-xs text-gray-400 dark:text-gray-500 font-medium shrink-0">
                           {format(date, "HH:mm")}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{method.label.split(' ')[0]} • {record.dosage} {record.unit}</p>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 truncate">{method.label.split(' ')[0]} • {record.dosage} {record.unit}</p>
+                        <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 transition-all">
                           <button 
                             onClick={() => handleEdit(record)}
-                            className="p-2 text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl transition-all"
+                            className="p-1.5 md:p-2 text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl transition-all"
                           >
-                            <Pencil className="w-4 h-4" />
+                            <Pencil className="w-3.5 h-3.5 md:w-4 md:h-4" />
                           </button>
                           <button 
                             onClick={() => handleDelete(record.id)}
-                            className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
+                            className="p-1.5 md:p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                           </button>
                         </div>
                       </div>

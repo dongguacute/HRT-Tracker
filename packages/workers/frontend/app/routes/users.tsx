@@ -140,7 +140,7 @@ export default function UserManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Users className="h-6 w-6 text-blue-600" />
+            <Users className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             {t('admin.users.title')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">{t('admin.users.manage_desc')}</p>
@@ -169,7 +169,7 @@ export default function UserManagement() {
             <input
               type="text"
               placeholder={t('admin.users.username')}
-              className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
               required
@@ -177,14 +177,14 @@ export default function UserManagement() {
             <input
               type="password"
               placeholder={t('admin.users.password')}
-              className="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+              className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
             />
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition-colors"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl transition-colors shadow-sm shadow-indigo-200 dark:shadow-none"
             >
               {t('admin.users.add_user')}
             </button>
@@ -214,7 +214,7 @@ export default function UserManagement() {
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     user.role === 'admin' 
                       ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' 
-                      : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                      : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
                   }`}>
                     {user.role === 'admin' ? t('common.account.role_admin') : t('common.account.role_user')}
                   </span>
@@ -251,7 +251,7 @@ export default function UserManagement() {
                         <>
                           <button 
                             onClick={() => setEditingUser(user.username)}
-                            className="text-blue-500 hover:text-blue-700 p-2 transition-colors"
+                            className="text-amber-500 hover:text-amber-700 p-2 transition-colors"
                             title={t('common.account.change_password')}
                           >
                             <Key className="h-4 w-4" />

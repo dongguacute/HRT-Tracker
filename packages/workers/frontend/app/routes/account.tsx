@@ -106,7 +106,7 @@ export default function Account() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <UserCircle className="h-6 w-6 text-blue-600" />
+            <UserCircle className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
             {t('common.account.info')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">{t('common.account.manage_desc')}</p>
@@ -137,7 +137,7 @@ export default function Account() {
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   user?.role === 'admin' 
                     ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' 
-                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                    : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
                 }`}>
                   {user?.role === 'admin' ? t('common.account.role_admin') : t('common.account.role_user')}
                 </span>
@@ -160,7 +160,7 @@ export default function Account() {
               <div className="pt-2">
                 <button
                   onClick={() => navigate("/users")}
-                  className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+                  className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
                 >
                   <Shield className="h-4 w-4" />
                   {t('common.account.go_to_user_management')}
@@ -174,7 +174,7 @@ export default function Account() {
                 className="w-full flex items-center justify-between group p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Lock className="h-4 w-4 text-indigo-500" />
+                  <Lock className="h-4 w-4 text-amber-500" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('common.account.change_password')}</span>
                 </div>
                 <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", showPasswordForm && "rotate-180")} />
@@ -197,7 +197,7 @@ export default function Account() {
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
                           required
-                          className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:text-white transition-all"
+                          className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none dark:text-white transition-all"
                         />
                         <button
                           type="button"
@@ -217,7 +217,7 @@ export default function Account() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           required
-                          className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:text-white transition-all"
+                          className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none dark:text-white transition-all"
                         />
                         <button
                           type="button"
@@ -236,7 +236,7 @@ export default function Account() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:text-white transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none dark:text-white transition-all"
                       />
                     </div>
 
@@ -257,7 +257,7 @@ export default function Account() {
                     <button
                       type="submit"
                       disabled={isChanging}
-                      className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {isChanging ? <Loader2 className="w-4 h-4 animate-spin" /> : t('common.confirm')}
                     </button>

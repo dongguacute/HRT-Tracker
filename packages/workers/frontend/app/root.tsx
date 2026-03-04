@@ -110,11 +110,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body className="flex h-screen overflow-hidden bg-gray-50 dark:bg-background" suppressHydrationWarning>
-        <Suspense fallback={<div className="w-64 h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05]" />}>
+      <body className="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-50 dark:bg-background" suppressHydrationWarning>
+        <Suspense fallback={<div className="hidden md:block w-64 h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05]" />}>
           <Sidebar />
         </Suspense>
-        <main className="flex-1 overflow-y-auto bg-white dark:bg-background shadow-sm border border-gray-100 dark:border-white/5">
+        <main className="flex-1 overflow-y-auto bg-white dark:bg-background shadow-sm border border-gray-100 dark:border-white/5 pb-28 md:pb-0">
           {children}
         </main>
         <ScrollRestoration />

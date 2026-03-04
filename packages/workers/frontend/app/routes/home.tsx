@@ -372,15 +372,15 @@ export default function Home() {
   }, [simulationData, isDark, t]);
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6 md:space-y-8">
       {/* 顶部状态卡片 */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden"
+        className="bg-white dark:bg-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden"
       >
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('home.current_conc')}</span>
             <button 
               onClick={() => setShowNotice(true)}
@@ -390,20 +390,20 @@ export default function Home() {
             </button>
           </div>
           {latestDosageLevel && (
-            <div className={cn("px-3 py-1 rounded-full text-xs font-bold", latestDosageLevel.color)}>
+            <div className={cn("px-3 py-1 rounded-full text-xs font-bold shrink-0", latestDosageLevel.color)}>
               {latestDosageLevel.label}
             </div>
           )}
         </div>
         
-        <div className="flex gap-12">
+        <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-pink-400" />
               <span className="text-sm font-bold text-gray-900 dark:text-white">{t('home.estradiol')}</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-gray-900 dark:text-white">{currentE2}</span>
+              <span className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">{currentE2}</span>
               <span className="text-sm font-bold text-gray-400 dark:text-gray-500">pg/mL</span>
             </div>
             {labRecords.length > 0 && (
@@ -431,7 +431,7 @@ export default function Home() {
               <span className="text-sm font-bold text-gray-900 dark:text-white">{t('home.cpa')}</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-gray-200 dark:text-white/10">--</span>
+              <span className="text-4xl md:text-5xl font-black text-gray-200 dark:text-white/10">--</span>
             </div>
           </div>
         </div>
@@ -444,7 +444,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/5"
+        className="bg-white dark:bg-card rounded-[24px] md:rounded-[32px] p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/5"
       >
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -461,7 +461,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="h-[400px] w-full">
+        <div className="h-[300px] md:h-[400px] w-full">
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-gray-400">{t('home.loading_chart')}</div>}>
             {isLoading ? (
               <div className="w-full h-full flex items-center justify-center text-gray-400">{t('home.calculating')}</div>

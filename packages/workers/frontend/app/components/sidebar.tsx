@@ -49,50 +49,83 @@ export function Sidebar() {
     : currentTime.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' });
 
   return (
-    <aside className="w-64 h-screen flex flex-col bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05] p-6">
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">HRT Tracker</h1>
-      </div>
-
-      <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) => cn(
-              "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group",
-              isActive 
-                ? "bg-[#E0F9F1] dark:bg-[#00A37B]/20 text-[#00A37B] dark:text-[#00c292] font-medium" 
-                : "text-gray-500 hover:bg-gray-50 dark:hover:bg-white/[0.03] hover:text-gray-900 dark:hover:text-white"
-            )}
-          >
-            {({ isActive }) => (
-              <>
-                <item.icon className={cn(
-                  "w-5 h-5 transition-colors",
-                  isActive ? "text-[#00A37B] dark:text-[#00c292]" : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
-                )} />
-                <span className="text-[15px]">{item.label}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00A37B] dark:bg-[#00c292]" />
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="mt-auto">
-        <div className="bg-[#F2F2F2] dark:bg-white/[0.03] rounded-[32px] p-6 flex flex-col items-start">
-          <span className="text-4xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
-            {timeString}
-          </span>
-          <div className="w-full h-px bg-gray-200 dark:bg-white/[0.05] mb-3" />
-          <span className="text-sm font-medium text-gray-500 tracking-wide">
-            {dateString}
-          </span>
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 h-screen flex-col bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05] p-6">
+        <div className="mb-10">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">HRT Tracker</h1>
         </div>
+
+        <nav className="flex-1 space-y-2">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => cn(
+                "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group",
+                isActive 
+                  ? "bg-[#E0F9F1] dark:bg-[#00A37B]/20 text-[#00A37B] dark:text-[#00c292] font-medium" 
+                  : "text-gray-500 hover:bg-gray-50 dark:hover:bg-white/[0.03] hover:text-gray-900 dark:hover:text-white"
+              )}
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon className={cn(
+                    "w-5 h-5 transition-colors",
+                    isActive ? "text-[#00A37B] dark:text-[#00c292]" : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+                  )} />
+                  <span className="text-[15px]">{item.label}</span>
+                  {isActive && (
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00A37B] dark:bg-[#00c292]" />
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="mt-auto">
+          <div className="bg-[#F2F2F2] dark:bg-white/[0.03] rounded-[32px] p-6 flex flex-col items-start">
+            <span className="text-4xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+              {timeString}
+            </span>
+            <div className="w-full h-px bg-gray-200 dark:bg-white/[0.05] mb-3" />
+            <span className="text-sm font-medium text-gray-500 tracking-wide">
+              {dateString}
+            </span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-8 left-0 right-0 px-4 z-50">
+        <nav className="bg-white/90 dark:bg-background/90 backdrop-blur-xl border border-gray-100 dark:border-white/[0.08] rounded-[32px] px-2 py-2 flex justify-between items-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => cn(
+                "flex flex-col items-center justify-center gap-1 transition-all duration-300 relative px-4 py-2 rounded-[24px]",
+                isActive 
+                  ? "bg-[#E0F9F1] dark:bg-[#00A37B]/20 text-[#00A37B] dark:text-[#00c292]" 
+                  : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              )}
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
+                  <span className={cn(
+                    "text-[11px] font-bold tracking-tight",
+                    isActive ? "opacity-100" : "opacity-80"
+                  )}>
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
       </div>
-    </aside>
+    </>
   );
 }
