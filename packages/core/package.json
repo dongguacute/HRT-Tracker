@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Production-grade TypeScript core library for estradiol pharmacokinetic modeling.",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"

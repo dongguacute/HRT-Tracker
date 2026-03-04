@@ -18,26 +18,31 @@ import {
   Bookmark,
   Plus,
   Activity,
-  ChevronLeft,
-  ChevronRight
+  ChevronLeft, 
+  ChevronRight,
+  Hexagon,
+  Loader,
+  Orbit,
+  Network
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { medicationStorage, type MedicationRecord } from "../utils/storage";
+import { Ester, Route } from "@hrt-tracker/core";
 
 const METHODS = [
-  { id: "Injection", label: "肌肉注射 (Injection)", icon: Syringe, color: "text-pink-500" },
-  { id: "Beta-Patch", label: "贴片贴上 (Beta)", icon: Bookmark, color: "text-orange-500" },
-  { id: "Beta-Remove", label: "贴片移除 (Beta)", icon: X, color: "text-gray-400" },
-  { id: "Beta-Gel", label: "凝胶 (Beta)", icon: Droplets, color: "text-blue-400" },
-  { id: "Oral", label: "口服 (Oral)", icon: Pill, color: "text-blue-500" },
-  { id: "Sublingual", label: "舌下 (Sublingual)", icon: Pill, color: "text-emerald-500" },
+  { id: "Injection", label: "肌肉注射 (Injection)", icon: Syringe, color: "text-pink-500", route: Route.Injection },
+  { id: "Beta-Patch", label: "贴片贴上 (Beta)", icon: Bookmark, color: "text-orange-500", route: Route.PatchApply },
+  { id: "Beta-Remove", label: "贴片移除 (Beta)", icon: X, color: "text-gray-400", route: Route.PatchRemove },
+  { id: "Beta-Gel", label: "凝胶 (Beta)", icon: Droplets, color: "text-blue-400", route: Route.Gel },
+  { id: "Oral", label: "口服 (Oral)", icon: Pill, color: "text-blue-500", route: Route.Oral },
+  { id: "Sublingual", label: "舌下 (Sublingual)", icon: Pill, color: "text-emerald-500", route: Route.Sublingual },
 ];
 
 const TYPES = [
-  { id: "EB", label: "苯甲酸雌二醇 (EB)", icon: "hexagon" },
-  { id: "EV", label: "戊酸雌二醇 (EV)", icon: "spiral" },
-  { id: "EC", label: "环戊丙酸雌二醇 (EC)", icon: "circle-dot" },
-  { id: "EN", label: "庚酸雌二醇 (EN)", icon: "git-branch" },
+  { id: "EB", label: "苯甲酸雌二醇 (EB)", icon: Hexagon, ester: Ester.EB },
+  { id: "EV", label: "戊酸雌二醇 (EV)", icon: Loader, ester: Ester.EV },
+  { id: "EC", label: "环戊丙酸雌二醇 (EC)", icon: Orbit, ester: Ester.EC },
+  { id: "EN", label: "庚酸雌二醇 (EN)", icon: Network, ester: Ester.EN },
 ];
 
 export default function RecordsPage() {
@@ -52,7 +57,8 @@ export default function RecordsPage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   useEffect(() => {
-    setRecords(medicationStorage.getRecords());
+    const loadedRecords = medicationStorage.getRecords();
+    setRecords(loadedRecords);
   }, []);
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +77,6 @@ export default function RecordsPage() {
     });
     setRecords([newRecord, ...records]);
     setShowAddForm(false);
-    // Reset form or show success
   };
 
   const handleDelete = (id: string) => {
@@ -79,8 +84,14 @@ export default function RecordsPage() {
     setRecords(records.filter(r => r.id !== id));
   };
 
-  const formatDate = (date: Date) => {
-    return format(date, "M月d日 HH:mm", { locale: zhCN });
+  const handleMethodToggle = () => {
+    setIsMethodOpen(!isMethodOpen);
+    if (!isMethodOpen) setIsTypeOpen(false);
+  };
+
+  const handleTypeToggle = () => {
+    setIsTypeOpen(!isTypeOpen);
+    if (!isTypeOpen) setIsMethodOpen(false);
   };
 
   return (
@@ -128,127 +139,127 @@ export default function RecordsPage() {
             
             <div className="space-y-6">
               {/* Time Picker */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-500">给药时间</label>
-              <div className="relative">
-                <div 
-                  onClick={() => setIsCalendarOpen(true)}
-                  className="w-full bg-white rounded-2xl p-4 flex items-center justify-between border border-transparent hover:border-gray-200 transition-all cursor-pointer"
-                >
-                  <span className="text-lg font-medium text-gray-900">
-                    {format(time, "EEE d MMM HH:mm", { locale: zhCN })}
-                  </span>
-                  <CalendarIcon className="w-5 h-5 text-gray-400" />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-500">给药时间</label>
+                <div className="relative">
+                  <div 
+                    onClick={() => setIsCalendarOpen(true)}
+                    className="w-full bg-white rounded-2xl p-4 flex items-center justify-between border border-transparent hover:border-gray-200 transition-all cursor-pointer"
+                  >
+                    <span className="text-lg font-medium text-gray-900">
+                      {format(time, "EEE d MMM HH:mm", { locale: zhCN })}
+                    </span>
+                    <CalendarIcon className="w-5 h-5 text-gray-400" />
+                  </div>
+
+                  <AnimatePresence>
+                    {isCalendarOpen && (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          onClick={() => setIsCalendarOpen(false)}
+                          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-100"
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[40px] p-8 shadow-2xl z-101 w-[90%] max-w-[400px]"
+                        >
+                          <div className="flex flex-col gap-6">
+                            <div className="flex items-baseline gap-3">
+                              <span className="text-3xl font-bold text-gray-900">
+                                {format(time, "EEE d MMM", { locale: zhCN })}
+                              </span>
+                              <input
+                                type="time"
+                                value={format(time, "HH:mm")}
+                                onChange={handleTimeChange}
+                                className="text-3xl font-bold text-gray-400 bg-transparent border-none focus:outline-none focus:text-gray-900 w-24"
+                              />
+                            </div>
+
+                            <div className="calendar-container">
+                              <style>{`
+                                .rdp-root {
+                                  --rdp-accent-color: #00A37B;
+                                  --rdp-accent-background-color: #E6F6F2;
+                                  margin: 0;
+                                }
+                                .rdp-day_button {
+                                  border-radius: 9999px !important;
+                                }
+                                .rdp-selected .rdp-day_button {
+                                  background-color: var(--rdp-accent-color) !important;
+                                  color: white !important;
+                                }
+                              `}</style>
+                              <DayPicker
+                                mode="single"
+                                selected={time}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    const newDate = setHours(setMinutes(date, time.getMinutes()), time.getHours());
+                                    setTime(newDate);
+                                  }
+                                }}
+                                locale={zhCN}
+                                classNames={{
+                                  month_caption: "flex justify-center py-2 mb-4 relative items-center text-lg font-bold text-gray-900",
+                                  nav: "flex items-center",
+                                  button_previous: "absolute left-1 z-10 flex h-7 w-7 items-center justify-center bg-transparent p-0 opacity-50 hover:opacity-100",
+                                  button_next: "absolute right-1 z-10 flex h-7 w-7 items-center justify-center bg-transparent p-0 opacity-50 hover:opacity-100",
+                                  month_grid: "w-full border-collapse space-y-1",
+                                  weekdays: "flex justify-between mb-2",
+                                  weekday: "text-gray-400 rounded-md w-9 font-medium text-[0.8rem] uppercase text-center",
+                                  week: "flex w-full justify-between mt-2",
+                                  day: "h-10 w-10 text-center text-sm p-0 relative flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors",
+                                  selected: "bg-[#00A37B] text-white hover:bg-[#008F6B] focus:bg-[#00A37B]",
+                                  today: "text-[#00A37B] font-bold",
+                                  outside: "text-gray-300 opacity-50",
+                                  disabled: "text-gray-300 opacity-50",
+                                  hidden: "invisible",
+                                }}
+                                components={{
+                                  Chevron: ({ orientation }) => {
+                                    if (orientation === 'left') return <ChevronLeft className="h-4 w-4" />;
+                                    return <ChevronRight className="h-4 w-4" />;
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            <div className="flex gap-4 mt-2">
+                              <button
+                                onClick={() => setIsCalendarOpen(false)}
+                                className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-[24px] font-bold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                              >
+                                <X className="w-5 h-5" />
+                                取消
+                              </button>
+                              <button
+                                onClick={() => setIsCalendarOpen(false)}
+                                className="flex-1 py-4 bg-[#00A37B] text-white rounded-[24px] font-bold hover:bg-[#008F6B] transition-colors flex items-center justify-center"
+                              >
+                                确定
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
                 </div>
-
-                <AnimatePresence>
-                  {isCalendarOpen && (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setIsCalendarOpen(false)}
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100]"
-                      />
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[40px] p-8 shadow-2xl z-[101] w-[90%] max-w-[400px]"
-                      >
-                        <div className="flex flex-col gap-6">
-                          <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-bold text-gray-900">
-                              {format(time, "EEE d MMM", { locale: zhCN })}
-                            </span>
-                            <input
-                              type="time"
-                              value={format(time, "HH:mm")}
-                              onChange={handleTimeChange}
-                              className="text-3xl font-bold text-gray-400 bg-transparent border-none focus:outline-none focus:text-gray-900 w-24"
-                            />
-                          </div>
-
-                          <div className="calendar-container">
-                            <style>{`
-                              .rdp-root {
-                                --rdp-accent-color: #00A37B;
-                                --rdp-accent-background-color: #E6F6F2;
-                                margin: 0;
-                              }
-                              .rdp-day_button {
-                                border-radius: 9999px !important;
-                              }
-                              .rdp-selected .rdp-day_button {
-                                background-color: var(--rdp-accent-color) !important;
-                                color: white !important;
-                              }
-                            `}</style>
-                            <DayPicker
-                              mode="single"
-                              selected={time}
-                              onSelect={(date) => {
-                                if (date) {
-                                  const newDate = setHours(setMinutes(date, time.getMinutes()), time.getHours());
-                                  setTime(newDate);
-                                }
-                              }}
-                              locale={zhCN}
-                              classNames={{
-                                month_caption: "flex justify-center py-2 mb-4 relative items-center text-lg font-bold text-gray-900",
-                                nav: "flex items-center",
-                                button_previous: "absolute left-1 z-10 flex h-7 w-7 items-center justify-center bg-transparent p-0 opacity-50 hover:opacity-100",
-                                button_next: "absolute right-1 z-10 flex h-7 w-7 items-center justify-center bg-transparent p-0 opacity-50 hover:opacity-100",
-                                month_grid: "w-full border-collapse space-y-1",
-                                weekdays: "flex justify-between mb-2",
-                                weekday: "text-gray-400 rounded-md w-9 font-medium text-[0.8rem] uppercase text-center",
-                                week: "flex w-full justify-between mt-2",
-                                day: "h-10 w-10 text-center text-sm p-0 relative flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors",
-                                selected: "bg-[#00A37B] text-white hover:bg-[#008F6B] focus:bg-[#00A37B]",
-                                today: "text-[#00A37B] font-bold",
-                                outside: "text-gray-300 opacity-50",
-                                disabled: "text-gray-300 opacity-50",
-                                hidden: "invisible",
-                              }}
-                              components={{
-                                Chevron: ({ orientation }) => {
-                                  if (orientation === 'left') return <ChevronLeft className="h-4 w-4" />;
-                                  return <ChevronRight className="h-4 w-4" />;
-                                }
-                              }}
-                            />
-                          </div>
-
-                          <div className="flex gap-4 mt-2">
-                            <button
-                              onClick={() => setIsCalendarOpen(false)}
-                              className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-[24px] font-bold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <X className="w-5 h-5" />
-                              取消
-                            </button>
-                            <button
-                              onClick={() => setIsCalendarOpen(false)}
-                              className="flex-1 py-4 bg-[#00A37B] text-white rounded-[24px] font-bold hover:bg-[#008F6B] transition-colors flex items-center justify-center"
-                            >
-                              确定
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
               </div>
-            </div>
 
               {/* Method Selector */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-500">给药途径</label>
                 <div className="relative">
                   <button 
-                    onClick={() => setIsMethodOpen(!isMethodOpen)}
+                    onClick={handleMethodToggle}
                     className="w-full bg-white rounded-2xl p-4 flex items-center gap-3 border border-transparent hover:border-gray-200 transition-all text-left"
                   >
                     <selectedMethod.icon className={cn("w-5 h-5", selectedMethod.color)} />
@@ -289,12 +300,10 @@ export default function RecordsPage() {
                 <label className="text-sm font-medium text-gray-500">药物类型</label>
                 <div className="relative">
                   <button 
-                    onClick={() => setIsTypeOpen(!isTypeOpen)}
+                    onClick={handleTypeToggle}
                     className="w-full bg-white rounded-2xl p-4 flex items-center gap-3 border border-transparent hover:border-gray-200 transition-all text-left"
                   >
-                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-gray-300" />
-                    </div>
+                    <selectedType.icon className="w-5 h-5 text-gray-400" />
                     <span className="text-lg font-medium text-gray-900 flex-1">{selectedType.label}</span>
                     <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform", isTypeOpen && "rotate-180")} />
                   </button>
@@ -316,9 +325,7 @@ export default function RecordsPage() {
                             }}
                             className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
                           >
-                            <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                              <div className="w-2 h-2 rounded-full bg-gray-300" />
-                            </div>
+                            <t.icon className="w-5 h-5 text-gray-400" />
                             <span className="text-lg font-medium text-gray-900 flex-1">{t.label}</span>
                             {selectedType.id === t.id && <Check className="w-5 h-5 text-[#00A37B]" />}
                           </button>
@@ -440,9 +447,12 @@ export default function RecordsPage() {
                     
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-bold text-gray-900">{type.label.split(' ')[0]} ({record.type})</h4>
+                        <div className="flex items-center gap-2">
+                          <type.icon className="w-4 h-4 text-gray-400" />
+                          <h4 className="font-bold text-gray-900">{type.label.split(' ')[0]} ({record.type})</h4>
+                        </div>
                         <span className="text-sm text-gray-400 font-medium">
-                          {date.getHours().toString().padStart(2, '0')}:{date.getMinutes().toString().padStart(2, '0')}
+                          {format(date, "HH:mm")}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
