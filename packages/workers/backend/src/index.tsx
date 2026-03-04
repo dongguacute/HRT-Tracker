@@ -335,14 +335,4 @@ app.get('/hello', (c) => {
   })
 })
 
-// 兜底路由：将所有非 API 请求转发给前端静态资源
-app.get('/*', async (c) => {
-  const res = await c.env.ASSETS.fetch(c.req.raw)
-  if (res.status === 404) {
-    // 如果资源不存在（比如直接访问 /login 路由），则返回 index.html 让前端路由处理
-    return await c.env.ASSETS.fetch(new Request(new URL('/', c.req.url)))
-  }
-  return res
-})
-
 export default app
