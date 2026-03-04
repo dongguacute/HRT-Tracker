@@ -29,6 +29,17 @@
     "disclaimer_2": "2. 药代动力学受个体差异（如基因、年龄、健康状况、生活方式等）影响巨大，模型估算值与实际血检结果可能存在显著偏差。",
     "disclaimer_3": "3. 严禁根据本软件的估算数据自行调整用药方案。任何用药调整必须在专业医师的指导下，结合实际临床表现和医院血检报告进行。",
     "disclaimer_4": "4. 开发者不对因使用本软件或其提供的信息而产生的任何直接或间接后果承担任何责任。",
+    "account": {
+      "title": "账户设置",
+      "change_password": "修改密码",
+      "old_password": "旧密码",
+      "new_password": "新密码",
+      "confirm_password": "确认新密码",
+      "password_mismatch": "两次输入的密码不一致",
+      "change_success": "密码修改成功",
+      "change_failed": "密码修改失败",
+      "invalid_old_password": "旧密码错误"
+    },
     "nav": {
       "dashboard": "概览",
       "records": "记录",

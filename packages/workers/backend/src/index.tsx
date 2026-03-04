@@ -3,9 +3,38 @@ import { runSimulation } from '@hrt-tracker/core'
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie'
 import { config } from 'dotenv'
 import { resolve } from 'path'
+import { readFileSync, writeFileSync, existsSync } from 'fs'
 
 // 加载根目录的 .env 文件
 config({ path: resolve(process.cwd(), '../../.env') })
+
+// 本地存储路径
+const USERS_FILE = resolve(process.cwd(), 'users.json')
+
+// 辅助函数：读写本地用户文件
+const readLocalUsers = () => {
+  if (existsSync(USERS_FILE)) {
+    try {
+      const data = readFileSync(USERS_FILE, 'utf-8')
+      return new Map(Object.entries(JSON.parse(data)))
+    } catch (e) {
+      console.error('Failed to read users.json:', e)
+    }
+  }
+  return new Map<string, any>()
+}
+
+const writeLocalUsers = (users: Map<string, any>) => {
+  try {
+    const data = JSON.stringify(Object.fromEntries(users))
+    writeFileSync(USERS_FILE, data, 'utf-8')
+  } catch (e) {
+    console.error('Failed to write users.json:', e)
+  }
+}
+
+// 内存回退存储（用于 Vite 开发环境，现在从文件加载）
+const memoryUsers = readLocalUsers()
 
 type Bindings = {
   ADMIN_USERNAME?: string
@@ -20,9 +49,6 @@ type Variables = {
     role: 'admin' | 'user'
   }
 }
-
-// 内存回退存储（用于 Vite 开发环境）
-const memoryUsers = new Map<string, any>()
 
 /**
  * Durable Object 用于存储用户信息
@@ -63,13 +89,18 @@ const getUserDataLayer = (c: Context<any>) => {
     }
   }
   
-  // Vite/Node 环境回退到内存
-  console.warn('USER_STORAGE not found, falling back to memory storage')
+  // Vite/Node 环境回退到本地文件持久化存储
   return {
     getUser: async (name: string) => memoryUsers.get(name),
     getUsers: async () => Array.from(memoryUsers.values()),
-    setUser: async (name: string, data: any) => memoryUsers.set(name, data),
-    deleteUser: async (name: string) => memoryUsers.delete(name)
+    setUser: async (name: string, data: any) => {
+      memoryUsers.set(name, data)
+      writeLocalUsers(memoryUsers)
+    },
+    deleteUser: async (name: string) => {
+      memoryUsers.delete(name)
+      writeLocalUsers(memoryUsers)
+    }
   }
 }
 
@@ -176,6 +207,33 @@ app.patch('/admin/users/:username', authMiddleware, async (c) => {
 
   user.password = password
   await storage.setUser(targetUsername, user)
+  return c.json({ success: true })
+})
+
+// 用户接口：修改自己的密码
+app.patch('/auth/password', authMiddleware, async (c) => {
+  const currentUser = c.get('user')
+  const { oldPassword, newPassword } = await c.req.json()
+
+  // 管理员密码存储在环境变量中，不支持通过此接口修改
+  const adminUser = process.env.ADMIN_USERNAME || c.env?.ADMIN_USERNAME
+  if (currentUser.username === adminUser) {
+    return c.json({ error: 'Admin password cannot be changed via this API' }, 403)
+  }
+
+  const storage = getUserDataLayer(c)
+  const user = await storage.getUser(currentUser.username)
+
+  if (!user) {
+    return c.json({ error: 'User not found' }, 404)
+  }
+
+  if (user.password !== oldPassword) {
+    return c.json({ error: 'Invalid old password' }, 400)
+  }
+
+  user.password = newPassword
+  await storage.setUser(currentUser.username, user)
   return c.json({ success: true })
 })
 
