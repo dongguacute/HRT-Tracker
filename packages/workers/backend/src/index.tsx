@@ -32,20 +32,40 @@ export class UserStorage {
   constructor(private state: any, private env: Bindings) {}
 
   async getUsers(): Promise<any[]> {
-    const users = await this.state.storage.list()
-    return Array.from(users.values())
+    try {
+      const users = await this.state.storage.list()
+      return Array.from(users.values())
+    } catch (e) {
+      console.error('Durable Object getUsers error:', e)
+      throw e
+    }
   }
 
   async getUser(username: string): Promise<any> {
-    return await this.state.storage.get(username)
+    try {
+      return await this.state.storage.get(username)
+    } catch (e) {
+      console.error(`Durable Object getUser error for ${username}:`, e)
+      throw e
+    }
   }
 
   async setUser(username: string, userData: any): Promise<void> {
-    await this.state.storage.put(username, userData)
+    try {
+      await this.state.storage.put(username, userData)
+    } catch (e) {
+      console.error(`Durable Object setUser error for ${username}:`, e)
+      throw e
+    }
   }
 
   async deleteUser(username: string): Promise<void> {
-    await this.state.storage.delete(username)
+    try {
+      await this.state.storage.delete(username)
+    } catch (e) {
+      console.error(`Durable Object deleteUser error for ${username}:`, e)
+      throw e
+    }
   }
 }
 
@@ -135,16 +155,51 @@ app.get('/auth/me', authMiddleware, (c) => {
 
 // 管理员接口：创建用户
 app.post('/admin/users', authMiddleware, adminMiddleware, async (c) => {
-  const { username, password } = await c.req.json()
-  const storage = getUserDataLayer(c)
-  
-  if (await storage.getUser(username)) {
-    return c.json({ error: 'User already exists' }, 400)
-  }
+  try {
+    console.log('Received create user request');
+    const body = await c.req.json();
+    console.log('Request body:', JSON.stringify(body));
+    const { username, password } = body;
+    
+    const storage = getUserDataLayer(c);
+    console.log('Data layer initialized');
+    
+    const existingUser = await storage.getUser(username);
+    console.log('Existing user check:', !!existingUser);
+    
+    if (existingUser) {
+      return c.json({ error: 'User already exists' }, 400)
+    }
 
-  const hashedPassword = await argon2id({ password, salt: crypto.getRandomValues(new Uint8Array(16)) })
-  await storage.setUser(username, { username, password: hashedPassword, role: 'user' })
-  return c.json({ success: true })
+    console.log('Hashing password...');
+    // 修复：确保在 Node.js 环境下也能正确获取 crypto
+    const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
+    const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+    
+    // 修复：hash-wasm 的 argon2id 需要显式指定参数，否则在某些环境下可能默认为 0 导致报错
+    const hashedPassword = await argon2id({ 
+      password, 
+      salt,
+      parallelism: 1,
+      iterations: 2,
+      memorySize: 16384, // 16MB
+      hashLength: 32
+    });
+    console.log('Password hashed successfully');
+    
+    await storage.setUser(username, { username, password: hashedPassword, role: 'user' });
+    console.log('User saved to storage');
+    
+    return c.json({ success: true })
+  } catch (e: any) {
+    console.error('Create user error details:', e);
+    return c.json({ 
+      error: 'Internal Server Error', 
+      message: e.message,
+      stack: e.stack,
+      type: e.constructor.name
+    }, 500)
+  }
 })
 
 // 管理员接口：修改用户密码
@@ -164,7 +219,16 @@ app.patch('/admin/users/:username', authMiddleware, adminMiddleware, async (c) =
     return c.json({ error: 'Cannot modify admin password via this API' }, 403)
   }
 
-  user.password = await argon2id({ password, salt: crypto.getRandomValues(new Uint8Array(16)) })
+  const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
+  const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+  user.password = await argon2id({ 
+    password, 
+    salt,
+    parallelism: 1,
+    iterations: 2,
+    memorySize: 16384,
+    hashLength: 32
+  })
   await storage.setUser(targetUsername, user)
   return c.json({ success: true })
 })
@@ -191,7 +255,16 @@ app.patch('/auth/password', authMiddleware, async (c) => {
     return c.json({ error: 'Invalid old password' }, 400)
   }
 
-  user.password = await argon2id({ password: newPassword, salt: crypto.getRandomValues(new Uint8Array(16)) })
+  const cryptoObj = typeof crypto !== 'undefined' ? crypto : (await import('node:crypto')).webcrypto;
+  const salt = cryptoObj.getRandomValues(new Uint8Array(16));
+  user.password = await argon2id({ 
+    password: newPassword, 
+    salt,
+    parallelism: 1,
+    iterations: 2,
+    memorySize: 16384,
+    hashLength: 32
+  })
   await storage.setUser(currentUser.username, user)
   return c.json({ success: true })
 })
@@ -237,10 +310,15 @@ app.delete('/admin/users/:username', authMiddleware, adminMiddleware, async (c) 
 })
 
 app.get('/admin/users', authMiddleware, adminMiddleware, async (c) => {
-  const storage = getUserDataLayer(c)
-  const users = await storage.getUsers()
-  
-  return c.json({ users: users.map((u: any) => ({ username: u.username, role: u.role })) })
+  try {
+    const storage = getUserDataLayer(c)
+    const users = await storage.getUsers()
+    
+    return c.json({ users: users.map((u: any) => ({ username: u.username, role: u.role })) })
+  } catch (e: any) {
+    console.error('Get users error:', e)
+    return c.json({ error: 'Internal Server Error', message: e.message }, 500)
+  }
 })
 
 // 原有接口
