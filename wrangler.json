@@ -22,5 +22,15 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "env": {
+    "production": {
+      "main": "build/server/index.js",
+      "assets": {
+        "directory": "build/client",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application"
+      }
+    }
   }
 }
