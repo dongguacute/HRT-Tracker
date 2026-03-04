@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@hrt-tracker/core": "workspace:*",
+    "argon2": "^0.44.0",
     "dotenv": "^17.3.1",
     "hono": "^4.7.2",
     "hono-sessions": "^0.8.1",

@@ -4,6 +4,7 @@ import { setCookie, getCookie, deleteCookie } from 'hono/cookie'
 import { config } from 'dotenv'
 import { resolve } from 'path'
 import { readFileSync, writeFileSync, existsSync } from 'fs'
+import * as argon2 from 'argon2'
 
 // 加载根目录的 .env 文件
 config({ path: resolve(process.cwd(), '../../.env') })
@@ -127,12 +128,15 @@ app.post('/auth/login', async (c) => {
 
   let user: { username: string, role: 'admin' | 'user' } | null = null
   
-  if (adminUser && username === adminUser && password === adminPass) {
-    user = { username: adminUser, role: 'admin' }
+  if (adminUser && username === adminUser) {
+    // 管理员密码验证
+    if (adminPass && (password === adminPass || (adminPass.startsWith('$argon2') && await argon2.verify(adminPass, password)))) {
+      user = { username: adminUser, role: 'admin' }
+    }
   } else {
     const storage = getUserDataLayer(c)
     const storedUser = await storage.getUser(username)
-    if (storedUser && storedUser.password === password) {
+    if (storedUser && await argon2.verify(storedUser.password, password)) {
       user = { 
         username: storedUser.username, 
         role: (storedUser.role === 'admin' ? 'admin' : 'user')
@@ -184,7 +188,8 @@ app.post('/admin/users', authMiddleware, async (c) => {
     return c.json({ error: 'User already exists' }, 400)
   }
 
-  await storage.setUser(username, { username, password, role: 'user' })
+  const hashedPassword = await argon2.hash(password)
+  await storage.setUser(username, { username, password: hashedPassword, role: 'user' })
   return c.json({ success: true })
 })
 
@@ -209,7 +214,7 @@ app.patch('/admin/users/:username', authMiddleware, async (c) => {
     return c.json({ error: 'Cannot modify admin password via this API' }, 403)
   }
 
-  user.password = password
+  user.password = await argon2.hash(password)
   await storage.setUser(targetUsername, user)
   return c.json({ success: true })
 })
@@ -232,11 +237,11 @@ app.patch('/auth/password', authMiddleware, async (c) => {
     return c.json({ error: 'User not found' }, 404)
   }
 
-  if (user.password !== oldPassword) {
+  if (!await argon2.verify(user.password, oldPassword)) {
     return c.json({ error: 'Invalid old password' }, 400)
   }
 
-  user.password = newPassword
+  user.password = await argon2.hash(newPassword)
   await storage.setUser(currentUser.username, user)
   return c.json({ success: true })
 })
