@@ -34,7 +34,7 @@ We strictly adhere to the `PKcore.swift` and `PKparameter.swift` logic provided 
 
   **隐私优先**：所有数据都完全存储在你浏览器的 `localStorage` 中，绝不会发送到任何服务器。
 
-* **Internationalization**: Native support for **Simplified Chinese** and **English**, **Traditional Chinese**, **Japanese**and more.<br>
+* **Internationalization**: Native support for **Simplified Chinese** and **English**, **Traditional Chinese**, **Japanese** and more.<br>
 
   **多语言支持**：原生支持多语言界面。
 
