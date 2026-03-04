@@ -16,6 +16,9 @@ export default defineConfig({
       entry: 'src/index.tsx',
       formats: ['es'],
       fileName: 'index'
+    },
+    rollupOptions: {
+      external: ['argon2']
     }
   }
 })
