@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfDay, addDays, differenceInHours } from "date-fns";
 import { 
@@ -7,10 +7,11 @@ import {
   Info,
   AlertCircle
 } from "lucide-react";
-import ReactECharts from 'echarts-for-react';
 import { cn } from "../utils/cn";
 import { medicationStorage, labStorage, settingsStorage } from "../utils/storage";
 import { runSimulation, Ester, Route, type DoseEvent, createCalibrationInterpolator, type LabResult as CoreLabResult, interpolateConcentration } from "@hrt-tracker/core";
+
+const ReactECharts = lazy(() => import('echarts-for-react'));
 
 const METHODS = [
   { id: "Injection", route: Route.Injection },
@@ -31,6 +32,11 @@ const TYPES = [
 export default function Home() {
   const [records, setRecords] = useState<any[]>([]);
   const [labRecords, setLabRecords] = useState<any[]>([]);
+
+  useEffect(() => {
+    setRecords(medicationStorage.getRecords());
+    setLabRecords(labStorage.getRecords());
+  }, []);
   const [showNotice, setShowNotice] = useState(false);
   const [isDark, setIsDark] = useState(false);
 
@@ -57,8 +63,7 @@ export default function Home() {
     if (records.length === 0 || labRecords.length === 0) return defaultVal;
     
     try {
-      const now = new Date();
-      const baseTime = now;
+      const baseTime = new Date();
       const events: DoseEvent[] = records.map(r => {
         const method = METHODS.find(m => m.id === r.method);
         const type = TYPES.find(t => t.id === r.type);
@@ -72,7 +77,7 @@ export default function Home() {
       });
 
       const settings = settingsStorage.getSettings();
-      const result = runSimulation(events, settings.weight || 60); // 使用设置中的体重
+      const result = runSimulation(events, settings.weight || 60);
       if (!result) return defaultVal;
 
       const coreLabResults: CoreLabResult[] = labRecords.map(lr => ({
@@ -82,7 +87,7 @@ export default function Home() {
         unit: lr.unit
       }));
       
-      const latestLab = coreLabResults[0]; // 获取最近的一次血检
+      const latestLab = coreLabResults[0];
       const theoryAtLab = interpolateConcentration(result, latestLab.timeH, 'concPGmL_E2') || 0;
       
       const interpolator = createCalibrationInterpolator(result, coreLabResults);
@@ -97,72 +102,99 @@ export default function Home() {
     }
   }, [records, labRecords]);
 
-  useEffect(() => {
-    setRecords(medicationStorage.getRecords());
-    setLabRecords(labStorage.getRecords());
-  }, []);
-
-  const handleConfirmNotice = () => {
-    setShowNotice(false);
-  };
-
   // 图表数据计算
-  const simulationData = useMemo(() => {
-    try {
-      if (records.length === 0) return [];
+  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-      const now = new Date();
-      // 使用精确的当前时间作为基准点 0
-      const baseTime = now;
-
-      const events: DoseEvent[] = records.map(r => {
-        const method = METHODS.find(m => m.id === r.method);
-        const type = TYPES.find(t => t.id === r.type);
-        const timeDate = new Date(r.time);
-        return {
-          id: r.id,
-          // 计算相对于当前时间的精确小时差
-          timeH: (timeDate.getTime() - baseTime.getTime()) / (1000 * 60 * 60),
-          doseMG: r.dosage,
-          ester: type?.ester || Ester.EV,
-          route: method?.route || Route.Injection,
-        };
-      });
-
-      const result = runSimulation(events, 60); // 默认体重 60kg
-      if (!result) {
-        return [];
+  useEffect(() => {
+    const fetchSimulation = async () => {
+      if (records.length === 0) {
+        setSimulationResult(null);
+        return;
       }
 
-      // 处理校准
-      let finalConc_E2 = [...result.concPGmL_E2];
-      if (labRecords.length > 0) {
-        const coreLabResults: CoreLabResult[] = labRecords.map(lr => ({
-          id: lr.id,
-          timeH: (new Date(lr.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
-          concValue: lr.value,
-          unit: lr.unit
-        }));
+      setIsLoading(true);
+      try {
+        const baseTime = new Date();
+        const events = records.map(r => {
+          const method = METHODS.find(m => m.id === r.method);
+          const type = TYPES.find(t => t.id === r.type);
+          return {
+            id: r.id,
+            timeH: (new Date(r.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+            doseMG: r.dosage,
+            ester: type?.ester || Ester.EV,
+            route: method?.route || Route.Injection,
+          };
+        });
+
+        const settings = settingsStorage.getSettings();
         
-        const interpolator = createCalibrationInterpolator(result, coreLabResults);
-        finalConc_E2 = result.timeH.map((t, i) => result.concPGmL_E2[i] * interpolator(t));
-      }
+        // 尝试调用后端 API
+        const response = await fetch('/api/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ events, weight: settings.weight })
+        });
 
-      if (!result.timeH || !result.concPGmL_E2 || !result.concPGmL_CPA) {
-        return [];
+        if (response.ok) {
+          const result = await response.json();
+          setSimulationResult(result);
+        } else {
+          // 后端失败则本地兜底
+          const result = runSimulation(events, settings.weight || 60);
+          setSimulationResult(result);
+        }
+      } catch (e) {
+        console.error("API failed, using local fallback", e);
+        // 网络失败则本地兜底
+        const baseTime = new Date();
+        const events = records.map(r => {
+          const method = METHODS.find(m => m.id === r.method);
+          const type = TYPES.find(t => t.id === r.type);
+          return {
+            id: r.id,
+            timeH: (new Date(r.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+            doseMG: r.dosage,
+            ester: type?.ester || Ester.EV,
+            route: method?.route || Route.Injection,
+          };
+        });
+        const result = runSimulation(events, 60);
+        setSimulationResult(result);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      return result.timeH.map((t: number, i: number) => ({
-        time: t,
-        displayTime: format(addDays(baseTime, t / 24), "M月d日 HH:mm"),
-        e2: Math.round(finalConc_E2[i] || 0),
-        cpa: Math.round(result.concPGmL_CPA[i] || 0),
+    fetchSimulation();
+  }, [records]);
+
+  const simulationData = useMemo(() => {
+    if (!simulationResult || !simulationResult.timeH) return [];
+    
+    const baseTime = new Date();
+    let finalConc_E2 = [...simulationResult.concPGmL_E2];
+    
+    if (labRecords.length > 0) {
+      const coreLabResults: CoreLabResult[] = labRecords.map(lr => ({
+        id: lr.id,
+        timeH: (new Date(lr.time).getTime() - baseTime.getTime()) / (1000 * 60 * 60),
+        concValue: lr.value,
+        unit: lr.unit
       }));
-    } catch (error) {
-      console.error("Error in simulationData useMemo:", error);
-      return [];
+      
+      const interpolator = createCalibrationInterpolator(simulationResult, coreLabResults);
+      finalConc_E2 = simulationResult.timeH.map((t: number, i: number) => simulationResult.concPGmL_E2[i] * interpolator(t));
     }
-  }, [records, labRecords]);
+
+    return simulationResult.timeH.map((t: number, i: number) => ({
+      time: t,
+      displayTime: format(addDays(baseTime, t / 24), "M月d日 HH:mm"),
+      e2: Math.round(finalConc_E2[i] || 0),
+      cpa: Math.round(simulationResult.concPGmL_CPA[i] || 0),
+    }));
+  }, [simulationResult, labRecords]);
 
   const currentE2 = simulationData.length > 0 ? simulationData.find((d: any) => d.time >= 0)?.e2 || 0 : 0;
 
@@ -326,7 +358,7 @@ export default function Home() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/[0.05] relative overflow-hidden"
+        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -393,7 +425,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/[0.05]"
+        className="bg-white dark:bg-card rounded-[32px] p-8 shadow-sm border border-gray-100 dark:border-white/5"
       >
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -408,12 +440,18 @@ export default function Home() {
         </div>
 
         <div className="h-[400px] w-full">
-          <ReactECharts 
-            option={chartOption} 
-            style={{ height: '100%', width: '100%' }}
-            notMerge={true}
-            lazyUpdate={true}
-          />
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-gray-400">加载图表中...</div>}>
+            {isLoading ? (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">计算模拟数据中...</div>
+            ) : (
+              <ReactECharts 
+                option={chartOption} 
+                style={{ height: '100%', width: '100%' }}
+                notMerge={true}
+                lazyUpdate={true}
+              />
+            )}
+          </Suspense>
         </div>
       </motion.div>
 

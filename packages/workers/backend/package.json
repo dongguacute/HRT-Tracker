@@ -8,6 +8,7 @@
     "start": "wrangler dev src/index.tsx"
   },
   "dependencies": {
+    "@hrt-tracker/core": "workspace:*",
     "hono": "^4.7.2"
   },
   "devDependencies": {
