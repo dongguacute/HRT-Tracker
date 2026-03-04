@@ -24,12 +24,14 @@ export interface Settings {
   theme: 'light' | 'dark' | 'system';
   weight: number;
   hasAcceptedDisclaimer: boolean;
+  isCloudSyncEnabled: boolean;
 }
 
 const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   weight: 60,
   hasAcceptedDisclaimer: false,
+  isCloudSyncEnabled: false,
 };
 
 export const settingsStorage = {
@@ -88,13 +90,78 @@ export const settingsStorage = {
     }
   },
 
-  clearAllData: () => {
+  clearAllData: async () => {
     if (typeof window === 'undefined') return;
+    
+    // 如果开启了云同步，清空云端数据
+    const settings = settingsStorage.getSettings();
+    if (settings.isCloudSyncEnabled) {
+      try {
+        await fetch('/api/user/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: null })
+        });
+      } catch (e) {
+        console.error('Failed to clear cloud data', e);
+      }
+    }
+
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(LAB_STORAGE_KEY);
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
     // 重新加载页面以应用默认设置
     window.location.reload();
+  },
+
+  syncToCloud: async () => {
+    const settings = settingsStorage.getSettings();
+    if (!settings.isCloudSyncEnabled) return;
+
+    const data = {
+      medicationRecords: medicationStorage.getRecords(),
+      labRecords: labStorage.getRecords(),
+      settings: settings
+    };
+
+    try {
+      const res = await fetch('/api/user/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data })
+      });
+      return res.ok;
+    } catch (e) {
+      console.error('Failed to sync to cloud', e);
+      return false;
+    }
+  },
+
+  fetchFromCloud: async () => {
+    try {
+      const res = await fetch('/api/user/sync');
+      if (res.ok) {
+        const { data } = await res.json();
+        // 无论 data 是否存在，都进行处理
+        // 如果 data 为 null，说明云端数据已被清空
+        const medicationRecords = data?.medicationRecords || [];
+        const labRecords = data?.labRecords || [];
+        const settings = data?.settings || null;
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(medicationRecords));
+        localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(labRecords));
+        
+        if (settings) {
+          localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ ...settings, isCloudSyncEnabled: true }));
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Failed to fetch from cloud', e);
+      return false;
+    }
   }
 };
 
@@ -120,6 +187,10 @@ export const medicationStorage = {
     };
     const updated = [newRecord, ...records];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
+    
     return newRecord;
   },
 
@@ -127,12 +198,19 @@ export const medicationStorage = {
     const records = medicationStorage.getRecords();
     const updated = records.filter(r => r.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
   },
 
   updateRecord: (id: string, record: Partial<Omit<MedicationRecord, 'id' | 'createdAt'>>) => {
     const records = medicationStorage.getRecords();
     const updated = records.map(r => r.id === id ? { ...r, ...record } : r);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
+    
     return updated.find(r => r.id === id);
   }
 };
@@ -159,6 +237,10 @@ export const labStorage = {
     };
     const updated = [newRecord, ...records].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
     localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
+    
     return newRecord;
   },
 
@@ -166,12 +248,19 @@ export const labStorage = {
     const records = labStorage.getRecords();
     const updated = records.filter(r => r.id !== id);
     localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
   },
 
   updateRecord: (id: string, record: Partial<Omit<LabRecord, 'id' | 'createdAt'>>) => {
     const records = labStorage.getRecords();
     const updated = records.map(r => r.id === id ? { ...r, ...record } : r);
     localStorage.setItem(LAB_STORAGE_KEY, JSON.stringify(updated));
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
+    
     return updated.find(r => r.id === id);
   }
 };

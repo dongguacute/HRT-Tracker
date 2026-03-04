@@ -23,6 +23,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { i18n } = useTranslation();
   
   useEffect(() => {
+    // 初始加载时尝试从云端同步数据
+    const settings = settingsStorage.getSettings();
+    if (settings.isCloudSyncEnabled) {
+      settingsStorage.fetchFromCloud().then(success => {
+        if (success) {
+          // 如果数据有更新，触发主题更新（或其他可能需要的 UI 更新）
+          updateTheme();
+        }
+      });
+    }
+
     // 监听系统主题变化
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const updateTheme = () => {

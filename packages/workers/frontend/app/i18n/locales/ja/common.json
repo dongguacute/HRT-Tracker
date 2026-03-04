@@ -1,5 +1,11 @@
 {
   "common": {
+    "cloud_sync": "クラウド同期",
+    "cloud_sync_desc": "すべての操作データがクラウドと同期されます",
+    "cloud_sync_login_required": "クラウド同期を有効にするにはログインが必要です",
+    "cloud_sync_overwrite_confirm": "クラウド同期を有効にすると、ローカルの既存データが上書きされます。続行しますか？",
+    "cloud_sync_enabled": "クラウド同期が有効です",
+    "cloud_sync_disabled": "クラウド同期が無効です",
     "settings": "設定",
     "appearance": "外観",
     "light": "ライト",

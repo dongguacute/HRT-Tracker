@@ -1,5 +1,11 @@
 {
   "common": {
+    "cloud_sync": "Cloud Sync",
+    "cloud_sync_desc": "Data is synchronized with the cloud for every operation",
+    "cloud_sync_login_required": "Login required to enable cloud sync",
+    "cloud_sync_overwrite_confirm": "Enabling cloud sync will overwrite existing local data. Are you sure you want to continue?",
+    "cloud_sync_enabled": "Cloud sync enabled",
+    "cloud_sync_disabled": "Cloud sync disabled",
     "settings": "Settings",
     "appearance": "Appearance",
     "light": "Light",

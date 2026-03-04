@@ -143,10 +143,14 @@ app.post('/auth/login', async (c) => {
   if (user) {
     const payload = { ...user, exp: Date.now() + 86400000 }
     const token = btoa(JSON.stringify({})) + '.' + btoa(JSON.stringify(payload)) + '.sig'
+    
+    // 自动判断是否为开发环境
+    const isDev = process.env.NODE_ENV === 'development' || !c.env?.USER_STORAGE;
+
     setCookie(c, 'auth_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'Strict',
+      secure: !isDev, // 开发环境(http)下设为 false，生产环境(https)下设为 true
+      sameSite: 'Lax', // 改为 Lax 以提高 Safari 兼容性
       maxAge: 86400,
       path: '/'
     })
@@ -233,6 +237,28 @@ app.patch('/auth/password', authMiddleware, async (c) => {
   }
 
   user.password = newPassword
+  await storage.setUser(currentUser.username, user)
+  return c.json({ success: true })
+})
+
+// 获取用户同步数据
+app.get('/user/sync', authMiddleware, async (c) => {
+  const currentUser = c.get('user')
+  const storage = getUserDataLayer(c)
+  const user = await storage.getUser(currentUser.username)
+  return c.json({ data: user?.syncData || null })
+})
+
+// 更新用户同步数据
+app.post('/user/sync', authMiddleware, async (c) => {
+  const currentUser = c.get('user')
+  const { data } = await c.req.json()
+  const storage = getUserDataLayer(c)
+  const user = await storage.getUser(currentUser.username)
+  
+  if (!user) return c.json({ error: 'User not found' }, 404)
+  
+  user.syncData = data
   await storage.setUser(currentUser.username, user)
   return c.json({ success: true })
 })

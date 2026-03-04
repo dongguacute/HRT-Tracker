@@ -1,5 +1,11 @@
 {
   "common": {
+    "cloud_sync": "云同步",
+    "cloud_sync_desc": "每步操作的数据都与云端同步",
+    "cloud_sync_login_required": "开启云同步需要先登录账号",
+    "cloud_sync_overwrite_confirm": "开启云同步将覆盖本地现有数据，确定要继续吗？",
+    "cloud_sync_enabled": "云同步已开启",
+    "cloud_sync_disabled": "云同步已关闭",
     "settings": "设置",
     "appearance": "外观",
     "light": "浅色",

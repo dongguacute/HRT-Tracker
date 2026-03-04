@@ -16,27 +16,87 @@ import {
   Heart,
   Languages,
   ChevronDown,
-  Check
+  Check,
+  Cloud,
+  CloudOff,
+  RefreshCw
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { cn } from "../utils/cn";
-import { settingsStorage, type Settings } from "../utils/storage";
+import { settingsStorage, medicationStorage, labStorage, type Settings } from "../utils/storage";
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [settings, setSettings] = useState<Settings>(settingsStorage.getSettings());
   const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showSyncConfirm, setShowSyncConfirm] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setUser(data?.user || null));
+  }, []);
 
   const handleThemeChange = (theme: Settings['theme']) => {
     const updated = settingsStorage.saveSettings({ theme });
     setSettings(updated);
   };
 
-  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const   handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const weight = parseFloat(e.target.value) || 0;
     const updated = settingsStorage.saveSettings({ weight });
     setSettings(updated);
+    
+    // 同步到云端
+    settingsStorage.syncToCloud();
+  };
+
+  const handleCloudSyncToggle = async () => {
+    if (!user) {
+      alert(t('common.cloud_sync_login_required'));
+      navigate('/login');
+      return;
+    }
+
+    if (!settings.isCloudSyncEnabled) {
+      const hasLocalData = medicationStorage.getRecords().length > 0 || labStorage.getRecords().length > 0;
+      if (hasLocalData) {
+        setShowSyncConfirm(true);
+      } else {
+        enableCloudSync();
+      }
+    } else {
+      const updated = settingsStorage.saveSettings({ isCloudSyncEnabled: false });
+      setSettings(updated);
+    }
+  };
+
+  const enableCloudSync = async () => {
+    setIsSyncing(true);
+    try {
+      // 开启云同步标志
+      const updated = settingsStorage.saveSettings({ isCloudSyncEnabled: true });
+      setSettings(updated);
+
+      // 尝试从云端获取数据
+      const success = await settingsStorage.fetchFromCloud();
+      if (success) {
+        // 如果云端有数据，fetchFromCloud 已经更新了 localStorage
+        // 刷新页面以应用新数据
+        window.location.reload();
+      } else {
+        // 如果云端没数据，则把本地的同步上去
+        await settingsStorage.syncToCloud();
+      }
+    } finally {
+      setIsSyncing(false);
+      setShowSyncConfirm(false);
+    }
   };
 
   const handleExport = () => {
@@ -198,22 +258,126 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* 云同步设置 */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('common.cloud_sync')}</h2>
+        <div className="bg-white dark:bg-card rounded-[32px] p-6 border border-gray-100 dark:border-white/5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
+                settings.isCloudSyncEnabled 
+                  ? "bg-emerald-50 dark:bg-emerald-500/10" 
+                  : "bg-gray-50 dark:bg-white/5"
+              )}>
+                {settings.isCloudSyncEnabled ? (
+                  <Cloud className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
+                ) : (
+                  <CloudOff className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                )}
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 dark:text-white">{t('common.cloud_sync')}</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">{t('common.cloud_sync_desc')}</div>
+              </div>
+            </div>
+            <button
+              onClick={handleCloudSyncToggle}
+              disabled={isSyncing}
+              className={cn(
+                "relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none",
+                settings.isCloudSyncEnabled ? "bg-emerald-500" : "bg-gray-200 dark:bg-white/10"
+              )}
+            >
+              <span
+                className={cn(
+                  "inline-block h-6 w-6 transform rounded-full bg-white transition-transform",
+                  settings.isCloudSyncEnabled ? "translate-x-7" : "translate-x-1"
+                )}
+              />
+            </button>
+          </div>
+
+          {showSyncConfirm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-orange-50 dark:bg-orange-500/10 p-4 rounded-2xl border border-orange-100 dark:border-orange-500/20 space-y-4"
+            >
+              <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                <AlertCircle className="w-5 h-5" />
+                <span className="font-bold">{t('common.cloud_sync_overwrite_confirm')}</span>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowSyncConfirm(false)}
+                  className="flex-1 py-2 px-4 rounded-xl bg-white dark:bg-white/5 text-gray-600 dark:text-gray-400 font-bold text-sm"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  onClick={enableCloudSync}
+                  className="flex-1 py-2 px-4 rounded-xl bg-orange-500 text-white font-bold text-sm"
+                >
+                  {t('common.confirm')}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {isSyncing && (
+            <div className="flex items-center gap-2 text-[#00A37B] text-sm font-bold animate-pulse">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              {t('common.loading')}
+            </div>
+          )}
+
+          {user && (
+            <div className="flex items-center gap-2 pt-2 border-t border-gray-50 dark:border-white/5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-xs text-gray-400">{t('common.account.username')}: {user.username}</span>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* 数据管理 */}
       <section className="space-y-4">
         <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">{t('common.data_management')}</h2>
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={handleExport}
-            className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+            disabled={settings.isCloudSyncEnabled}
+            className={cn(
+              "flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 transition-colors group",
+              settings.isCloudSyncEnabled 
+                ? "opacity-50 cursor-not-allowed" 
+                : "hover:bg-gray-50 dark:hover:bg-white/5"
+            )}
           >
-            <Download className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]" />
+            <Download className={cn(
+              "w-6 h-6 text-gray-400 dark:text-gray-500",
+              !settings.isCloudSyncEnabled && "group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]"
+            )} />
             <span className="font-bold text-gray-700 dark:text-gray-200">{t('common.export_json')}</span>
           </button>
           
-          <label className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group cursor-pointer">
-            <Upload className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]" />
+          <label className={cn(
+            "flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 transition-colors group cursor-pointer",
+            settings.isCloudSyncEnabled && "opacity-50 cursor-not-allowed"
+          )}>
+            <Upload className={cn(
+              "w-6 h-6 text-gray-400 dark:text-gray-500",
+              !settings.isCloudSyncEnabled && "group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]"
+            )} />
             <span className="font-bold text-gray-700 dark:text-gray-200">{t('common.import_data')}</span>
-            <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+            <input 
+              type="file" 
+              accept=".json" 
+              onChange={handleImport} 
+              disabled={settings.isCloudSyncEnabled}
+              className="hidden" 
+            />
           </label>
         </div>
         

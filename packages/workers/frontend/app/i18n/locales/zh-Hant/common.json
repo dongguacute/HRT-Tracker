@@ -1,5 +1,11 @@
 {
   "common": {
+    "cloud_sync": "雲同步",
+    "cloud_sync_desc": "每步操作的數據都與雲端同步",
+    "cloud_sync_login_required": "開啟雲同步需要先登錄賬號",
+    "cloud_sync_overwrite_confirm": "開啟雲同步將覆蓋本地現有數據，確定要繼續嗎？",
+    "cloud_sync_enabled": "雲同步已開啟",
+    "cloud_sync_disabled": "雲同步已關閉",
     "settings": "設定",
     "appearance": "外觀",
     "light": "淺色",
