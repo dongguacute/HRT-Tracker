@@ -31,7 +31,7 @@ export function Sidebar() {
     { icon: Calendar, label: t('common.nav.records'), to: "/records" },
     { icon: Scale, label: t('common.nav.calibration'), to: "/calibration" },
     { icon: Settings, label: t('common.nav.settings'), to: "/settings" },
-    ...(isAdmin ? [{ icon: Users, label: "用户管理", to: "/users" }] : []),
+    ...(isAdmin ? [{ icon: Users, label: t('common.nav.users'), to: "/users" }] : []),
     { icon: UserCircle, label: t('common.nav.account'), to: "/account" },
   ];
 

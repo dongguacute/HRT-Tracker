@@ -64,6 +64,7 @@
       "records": "Records",
       "calibration": "Calibration",
       "settings": "Settings",
+      "users": "User Management",
       "account": "Account"
     },
     "body_params": {
