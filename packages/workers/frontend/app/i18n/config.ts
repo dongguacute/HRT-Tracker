@@ -5,6 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import enCommon from './locales/en/common.json';
 import zhCNCommon from './locales/zh-CN/common.json';
 import zhHantCommon from './locales/zh-Hant/common.json';
+import jaCommon from './locales/ja/common.json';
 
 i18n
   .use(LanguageDetector)
