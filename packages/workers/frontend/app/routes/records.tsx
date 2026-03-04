@@ -437,7 +437,7 @@ export default function RecordsPage() {
                     <li>戊酸雌二醇：每 5-7 天 5 mg / 每 1-2 周 10 mg</li>
                     <li>环戊丙酸雌二醇：每 7 天 5-6 mg / 每 14 天 10-12 mg</li>
                   </ul>
-                  <a href="#" className="text-sm text-[#00A37B] flex items-center gap-1 hover:underline">
+                  <a href="https://transfemscience.org/misc/injectable-e2-simulator/" className="text-sm text-[#00A37B] flex items-center gap-1 hover:underline">
                     雌二醇注射剂模拟计算器 (英文) <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -458,7 +458,7 @@ export default function RecordsPage() {
                   <li>• 如果在某次注射结束后有较以往更多出血 (但可以止住)，属于正常现象，请不要惊慌。</li>
                 </ul>
                 <div className="pt-2 border-t border-gray-200">
-                  <a href="#" className="text-xs text-gray-400 flex items-center gap-1 hover:underline">
+                  <a href="https://mtf.wiki" className="text-xs text-gray-400 flex items-center gap-1 hover:underline">
                     来源: Mtf.wiki <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
