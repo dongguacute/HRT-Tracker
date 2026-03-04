@@ -2,41 +2,14 @@ import { Hono, Context, Next } from 'hono'
 import { runSimulation } from '@hrt-tracker/core'
 import { setCookie, getCookie, deleteCookie } from 'hono/cookie'
 import { config } from 'dotenv'
-import { resolve } from 'path'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
 import * as argon2 from 'argon2'
 import { authMiddleware, adminMiddleware } from './middleware/auth'
 
 // 加载根目录的 .env 文件
-config({ path: resolve(process.cwd(), '../../.env') })
+config()
 
-// 本地存储路径
-const USERS_FILE = resolve(process.cwd(), 'users.json')
-
-// 辅助函数：读写本地用户文件
-const readLocalUsers = () => {
-  if (existsSync(USERS_FILE)) {
-    try {
-      const data = readFileSync(USERS_FILE, 'utf-8')
-      return new Map(Object.entries(JSON.parse(data)))
-    } catch (e) {
-      console.error('Failed to read users.json:', e)
-    }
-  }
-  return new Map<string, any>()
-}
-
-const writeLocalUsers = (users: Map<string, any>) => {
-  try {
-    const data = JSON.stringify(Object.fromEntries(users))
-    writeFileSync(USERS_FILE, data, 'utf-8')
-  } catch (e) {
-    console.error('Failed to write users.json:', e)
-  }
-}
-
-// 内存回退存储（用于 Vite 开发环境，现在从文件加载）
-const memoryUsers = readLocalUsers()
+// 内存回退存储（用于 Vite 开发环境）
+const memoryUsers = new Map<string, any>()
 
 type Bindings = {
   ADMIN_USERNAME?: string
@@ -91,17 +64,15 @@ const getUserDataLayer = (c: Context<any>) => {
     }
   }
   
-  // Vite/Node 环境回退到本地文件持久化存储
+  // Vite/Node 环境回退到内存存储
   return {
     getUser: async (name: string) => memoryUsers.get(name),
     getUsers: async () => Array.from(memoryUsers.values()),
     setUser: async (name: string, data: any) => {
       memoryUsers.set(name, data)
-      writeLocalUsers(memoryUsers)
     },
     deleteUser: async (name: string) => {
       memoryUsers.delete(name)
-      writeLocalUsers(memoryUsers)
     }
   }
 }
