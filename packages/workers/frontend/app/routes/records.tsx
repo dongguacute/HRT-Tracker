@@ -86,45 +86,44 @@ export default function RecordsPage() {
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-8">
       {/* Header / Trigger Button */}
-      <AnimatePresence mode="wait">
-        {!showAddForm ? (
-          <motion.div 
-            key="trigger"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            onClick={() => setShowAddForm(true)}
-            className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center">
-                <Activity className="w-6 h-6 text-pink-400" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">用药记录</h2>
-                <p className="text-sm text-gray-400">{records.length} 条记录</p>
-              </div>
-            </div>
-            <div className="w-12 h-12 rounded-2xl bg-[#E6F6F2] flex items-center justify-center">
-              <Plus className="w-6 h-6 text-[#00A37B]" />
-            </div>
-          </motion.div>
-        ) : (
-          /* Add Record Card */
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={() => setShowAddForm(!showAddForm)}
+        className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center">
+            <Activity className="w-6 h-6 text-pink-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">用药记录</h2>
+            <p className="text-sm text-gray-400">{records.length} 条记录</p>
+          </div>
+        </div>
+        <div className={cn(
+          "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300",
+          showAddForm ? "bg-pink-50" : "bg-[#E6F6F2]"
+        )}>
+          {showAddForm ? (
+            <X className="w-6 h-6 text-pink-400" />
+          ) : (
+            <Plus className="w-6 h-6 text-[#00A37B]" />
+          )}
+        </div>
+      </motion.div>
+
+      {/* Add Record Card */}
+      <AnimatePresence>
+        {showAddForm && (
           <motion.div 
             key="form"
-            initial={{ opacity: 0, height: 0, y: 20 }}
+            initial={{ opacity: 0, height: 0, y: -20 }}
             animate={{ opacity: 1, height: "auto", y: 0 }}
-            exit={{ opacity: 0, height: 0, y: 20 }}
+            exit={{ opacity: 0, height: 0, y: -20 }}
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
             className="bg-[#F2F2F2] rounded-[32px] p-8 shadow-sm relative overflow-hidden"
           >
-            <button 
-              onClick={() => setShowAddForm(false)}
-              className="absolute top-6 right-6 p-2 text-gray-400 hover:bg-gray-200 rounded-full transition-colors z-20"
-            >
-              <X className="w-6 h-6" />
-            </button>
             <h2 className="text-xl font-bold text-gray-900 mb-6">新增用药记录</h2>
             
             <div className="space-y-6">
@@ -392,10 +391,7 @@ export default function RecordsPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-4">
-                <button className="p-4 bg-white rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors">
-                  <Bookmark className="w-6 h-6 text-gray-400" />
-                </button>
+              <div className="flex items-center justify-end pt-4">
                 <button 
                   onClick={handleSave}
                   className="px-8 py-4 bg-[#00A37B] text-white rounded-2xl font-bold flex items-center gap-2 hover:bg-[#008F6B] transition-all shadow-lg shadow-[#00A37B]/20"
