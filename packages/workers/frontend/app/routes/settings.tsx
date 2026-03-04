@@ -10,7 +10,10 @@ import {
   ShieldAlert,
   CheckCircle2,
   AlertCircle,
-  Trash2
+  Trash2,
+  ExternalLink,
+  Github,
+  Heart
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { settingsStorage, type Settings } from "../utils/storage";
@@ -102,7 +105,7 @@ export default function SettingsPage() {
       {/* 体重设置 */}
       <section className="space-y-4">
         <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">身体参数</h2>
-        <div className="bg-white dark:bg-card rounded-[32px] p-6 border border-gray-100 dark:border-white/[0.05] flex items-center justify-between">
+        <div className="bg-white dark:bg-card rounded-[32px] p-6 border border-gray-100 dark:border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
               <Weight className="w-6 h-6 text-blue-500 dark:text-blue-400" />
@@ -127,13 +130,13 @@ export default function SettingsPage() {
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={handleExport}
-            className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
+            className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
           >
             <Download className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]" />
             <span className="font-bold text-gray-700 dark:text-gray-200">导出 JSON</span>
           </button>
           
-          <label className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/[0.05] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group cursor-pointer">
+          <label className="flex items-center justify-center gap-3 p-6 rounded-[32px] bg-white dark:bg-card border border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group cursor-pointer">
             <Upload className="w-6 h-6 text-gray-400 dark:text-gray-500 group-hover:text-[#00A37B] dark:group-hover:text-[#00c292]" />
             <span className="font-bold text-gray-700 dark:text-gray-200">导入数据</span>
             <input type="file" accept=".json" onChange={handleImport} className="hidden" />
@@ -197,6 +200,70 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* 关于项目 */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">关于项目</h2>
+        <div className="bg-white dark:bg-card rounded-[32px] p-6 border border-gray-100 dark:border-white/5 space-y-4">
+          <a 
+            href="https://mahiro.uk/articles/estrogen-model-summary" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+                <ExternalLink className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 dark:text-white group-hover:text-[#00A37B] transition-colors">模型解释</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">了解药代动力学模型的科学原理</div>
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-[#00A37B] transition-colors" />
+          </a>
+
+          <div className="h-px bg-gray-50 dark:bg-white/5 mx-2" />
+
+          <a 
+            href="https://github.com/dongguacute/HRT-Tracker" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center">
+                <Github className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 dark:text-white group-hover:text-[#00A37B] transition-colors">GitHub 仓库</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">本项目的源代码仓库</div>
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-[#00A37B] transition-colors" />
+          </a>
+
+          <div className="h-px bg-gray-50 dark:bg-white/5 mx-2" />
+
+          <a 
+            href="https://github.com/SmirnovaOyama" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-pink-50 dark:bg-pink-500/10 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-pink-500 dark:text-pink-400" />
+              </div>
+              <div>
+                <div className="font-bold text-gray-900 dark:text-white group-hover:text-[#00A37B] transition-colors">原作者</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">致敬原作者 SmirnovaOyama 的贡献</div>
+              </div>
+            </div>
+            <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-[#00A37B] transition-colors" />
+          </a>
         </div>
       </section>
 
