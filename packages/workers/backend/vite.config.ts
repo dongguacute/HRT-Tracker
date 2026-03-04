@@ -18,7 +18,7 @@ export default defineConfig({
       fileName: 'index'
     },
     rollupOptions: {
-      external: ['argon2']
+      external: ['@node-rs/argon2']
     }
   }
 })
