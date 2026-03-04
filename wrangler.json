@@ -1,6 +1,6 @@
 {
   "name": "hrt-tracker-backend",
-  "main": "build/server/index.js",
+  "main": "packages/workers/backend/src/index.tsx",
   "compatibility_date": "2025-08-03",
   "compatibility_flags": [
     "nodejs_compat"

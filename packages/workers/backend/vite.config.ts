@@ -11,13 +11,15 @@ export default defineConfig({
     })
   ],
   build: {
-    ssr: true,
-    lib: {
-      entry: 'src/index.tsx',
-      formats: ['es'],
-      fileName: 'index'
-    },
+    outDir: 'dist',
+    emptyOutDir: true,
+    minify: false,
     rollupOptions: {
+      input: 'src/index.tsx',
+      output: {
+        format: 'es',
+        inlineDynamicImports: true
+      },
       external: ['cloudflare:workers']
     }
   }

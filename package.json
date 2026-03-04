@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nx run-many --target=dev --all --parallel=3",
     "build": "nx run-many --target=build --all --parallel=3",
-    "deploy": "pnpm build && wrangler deploy",
+    "deploy": "pnpm build --skip-nx-cache && wrangler deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
