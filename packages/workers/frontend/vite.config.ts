@@ -2,6 +2,7 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   server: {
@@ -16,6 +17,68 @@ export default defineConfig({
     tailwindcss(),
     reactRouter(),
     tsconfigPaths(),
+    {
+      name: 'ignore-static-assets-error',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (
+            req.url?.includes('.well-known/appspecific/com.chrome.devtools.json') ||
+            req.url === '/index.html'
+          ) {
+            res.statusCode = 404;
+            res.end();
+            return;
+          }
+          next();
+        });
+      }
+    },
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      strategies: 'generateSW',
+      workbox: {
+        mode: 'development',
+        globPatterns: ['**/*.{js,css,html,ico,svg}'],
+        globIgnores: ['**/index.html'],
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module',
+        navigateFallback: '/',
+      },
+      selfDestroying: false,
+      manifest: {
+        name: 'HRT Tracker',
+        short_name: 'HRT Tracker',
+        description: 'Track your HRT progress',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: '/logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any'
+          },
+          {
+            src: '/logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      }
+    }),
   ],
   build: {
     outDir: "../../../build/client",

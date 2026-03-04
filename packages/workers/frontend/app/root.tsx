@@ -6,8 +6,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { useEffect, Suspense, lazy } from "react";
+import { useEffect, Suspense, lazy, useState } from "react";
 import "./i18n/config";
+
+// @ts-ignore
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -21,8 +24,19 @@ import { useTranslation } from "react-i18next";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { i18n } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+  
+  useRegisterSW({
+    onRegistered(r: any) {
+      console.log('SW registered');
+    },
+    onRegisterError(error: any) {
+      console.log('SW registration error: ' + error);
+    },
+  });
   
   useEffect(() => {
+    setMounted(true);
     // 初始加载时尝试从云端同步数据
     const settings = settingsStorage.getSettings();
     if (settings.isCloudSyncEnabled) {
@@ -87,6 +101,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="icon" type="image/png" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <meta name="theme-color" content="#ffffff" />
         <Meta />
         <Links />
         <script
@@ -112,10 +130,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex flex-col md:flex-row h-screen overflow-hidden bg-gray-50 dark:bg-background" suppressHydrationWarning>
         <Suspense fallback={<div className="hidden md:block w-64 h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05]" />}>
-          <Sidebar />
+          {mounted ? <Sidebar /> : <div className="hidden md:block w-64 h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.05]" />}
         </Suspense>
         <main className="flex-1 overflow-y-auto bg-white dark:bg-background shadow-sm border border-gray-100 dark:border-white/5 pb-28 md:pb-0">
-          {children}
+          {mounted ? children : null}
         </main>
         <ScrollRestoration />
         <Scripts />
