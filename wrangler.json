@@ -1,11 +1,18 @@
 {
   "name": "hrt-tracker-backend",
+  "main": "packages/workers/backend/src/index.tsx",
   "compatibility_date": "2025-08-03",
-  "main": "build/server/index.js",
   "assets": {
     "directory": "build/client",
     "binding": "ASSETS"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hrt-tracker-db",
+      "database_id": "YOUR_DATABASE_ID_HERE"
+    }
+  ],
   "observability": {
     "enabled": true
   }
