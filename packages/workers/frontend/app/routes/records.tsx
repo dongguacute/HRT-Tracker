@@ -23,7 +23,9 @@ import {
   Hexagon,
   Loader,
   Orbit,
-  Network
+  Network,
+  Info,
+  Pencil
 } from "lucide-react";
 import { cn } from "../utils/cn";
 import { medicationStorage, type MedicationRecord } from "../utils/storage";
@@ -48,6 +50,7 @@ const TYPES = [
 export default function RecordsPage() {
   const [records, setRecords] = useState<MedicationRecord[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState(METHODS[0]);
   const [selectedType, setSelectedType] = useState(TYPES[1]);
   const [dosage, setDosage] = useState("0.0");
@@ -68,21 +71,58 @@ export default function RecordsPage() {
   };
 
   const handleSave = () => {
-    const newRecord = medicationStorage.saveRecord({
+    const recordData = {
       time: time.toISOString(),
       method: selectedMethod.id,
       type: selectedType.id,
       dosage: parseFloat(dosage) || 0,
       unit: "mg",
-    });
-    setRecords([newRecord, ...records]);
+    };
+
+    if (editingId) {
+      const updatedRecord = medicationStorage.updateRecord(editingId, recordData);
+      if (updatedRecord) {
+        setRecords(records.map(r => r.id === editingId ? updatedRecord : r));
+      }
+      setEditingId(null);
+    } else {
+      const newRecord = medicationStorage.saveRecord(recordData);
+      setRecords([newRecord, ...records]);
+    }
     setShowAddForm(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setSelectedMethod(METHODS[0]);
+    setSelectedType(TYPES[1]);
+    setDosage("0.0");
+    setTime(new Date());
+    setEditingId(null);
+  };
+
+  const handleEdit = (record: MedicationRecord) => {
+    setEditingId(record.id);
+    setSelectedMethod(METHODS.find(m => m.id === record.method) || METHODS[0]);
+    setSelectedType(TYPES.find(t => t.id === record.type) || TYPES[0]);
+    setDosage(record.dosage.toString());
+    setTime(new Date(record.time));
+    setShowAddForm(true);
   };
 
   const handleDelete = (id: string) => {
     medicationStorage.deleteRecord(id);
     setRecords(records.filter(r => r.id !== id));
   };
+
+  const getDosageLevel = (dosageValue: number) => {
+    if (dosageValue <= 1.5) return { label: "低剂量", color: "bg-emerald-100 text-emerald-600" };
+    if (dosageValue <= 3.0) return { label: "中等剂量", color: "bg-blue-100 text-blue-600" };
+    if (dosageValue <= 6.0) return { label: "高剂量", color: "bg-orange-100 text-orange-600" };
+    return { label: "超高剂量", color: "bg-red-100 text-red-600" };
+  };
+
+  const currentDosageLevel = getDosageLevel(parseFloat(dosage) || 0);
 
   const handleMethodToggle = () => {
     setIsMethodOpen(!isMethodOpen);
@@ -100,7 +140,14 @@ export default function RecordsPage() {
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        onClick={() => setShowAddForm(!showAddForm)}
+        onClick={() => {
+          if (showAddForm || editingId) {
+            setShowAddForm(false);
+            resetForm();
+          } else {
+            setShowAddForm(true);
+          }
+        }}
         className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
       >
         <div className="flex items-center gap-4">
@@ -114,9 +161,9 @@ export default function RecordsPage() {
         </div>
         <div className={cn(
           "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300",
-          showAddForm ? "bg-pink-50" : "bg-[#E6F6F2]"
+          (showAddForm || editingId) ? "bg-pink-50" : "bg-[#E6F6F2]"
         )}>
-          {showAddForm ? (
+          {(showAddForm || editingId) ? (
             <X className="w-6 h-6 text-pink-400" />
           ) : (
             <Plus className="w-6 h-6 text-[#00A37B]" />
@@ -124,9 +171,9 @@ export default function RecordsPage() {
         </div>
       </motion.div>
 
-      {/* Add Record Card */}
+      {/* Add/Edit Record Card */}
       <AnimatePresence>
-        {showAddForm && (
+        {(showAddForm || editingId) && (
           <motion.div 
             key="form"
             initial={{ opacity: 0, height: 0, y: -20 }}
@@ -135,9 +182,29 @@ export default function RecordsPage() {
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
             className="bg-[#F2F2F2] rounded-[32px] p-8 shadow-sm relative overflow-hidden"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-6">新增用药记录</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {editingId ? "编辑用药记录" : "新增用药记录"}
+            </h2>
             
             <div className="space-y-6">
+              {/* Dosage Level Reference */}
+              <div className="bg-[#E6F6F2] border border-[#00A37B]/10 rounded-2xl p-4 flex gap-3">
+                <Info className="w-5 h-5 text-[#00A37B] shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-gray-900">剂量级别参考</h4>
+                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold", currentDosageLevel.color)}>
+                      {currentDosageLevel.label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    当前输入剂量：{dosage || "0"} mg/天
+                  </p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    参考范围：低剂量 ≤ 1.5 mg/天 · 中等剂量 ≤ 3 mg/天 · 高剂量 ≤ 6 mg/天 · 超高剂量 ≤ 9 mg/天
+                  </p>
+                </div>
+              </div>
               {/* Time Picker */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-500">给药时间</label>
@@ -457,12 +524,20 @@ export default function RecordsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-gray-500">{method.label.split(' ')[0]} • {record.dosage} {record.unit}</p>
-                        <button 
-                          onClick={() => handleDelete(record.id)}
-                          className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:bg-red-50 rounded-xl transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                          <button 
+                            onClick={() => handleEdit(record)}
+                            className="p-2 text-blue-400 hover:bg-blue-50 rounded-xl transition-all"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(record.id)}
+                            className="p-2 text-red-400 hover:bg-red-50 rounded-xl transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

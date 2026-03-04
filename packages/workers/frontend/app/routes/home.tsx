@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { format, startOfDay, addDays, differenceInHours } from "date-fns";
 import { 
   Activity,
   RotateCcw,
-  Info
+  Info,
+  AlertCircle
 } from "lucide-react";
 import ReactECharts from 'echarts-for-react';
 import { cn } from "../utils/cn";
@@ -29,10 +30,15 @@ const TYPES = [
 
 export default function Home() {
   const [records, setRecords] = useState<any[]>([]);
+  const [showNotice, setShowNotice] = useState(false);
 
   useEffect(() => {
     setRecords(medicationStorage.getRecords());
   }, []);
+
+  const handleConfirmNotice = () => {
+    setShowNotice(false);
+  };
 
   // 图表数据计算
   const simulationData = useMemo(() => {
@@ -75,6 +81,20 @@ export default function Home() {
   }, [records]);
 
   const currentE2 = simulationData.length > 0 ? simulationData.find((d: any) => d.time >= 0)?.e2 || 0 : 0;
+
+  const getDosageLevel = (dosageValue: number) => {
+    if (dosageValue <= 1.5) return { label: "低剂量", color: "bg-emerald-50 text-emerald-400" };
+    if (dosageValue <= 3.0) return { label: "中等剂量", color: "bg-blue-50 text-blue-400" };
+    if (dosageValue <= 6.0) return { label: "高剂量", color: "bg-orange-50 text-orange-400" };
+    return { label: "超高剂量", color: "bg-red-50 text-red-400" };
+  };
+
+  // 获取最近一次用药的剂量级别
+  const latestDosageLevel = useMemo(() => {
+    if (records.length === 0) return null;
+    const latestRecord = records[0]; // records 已经是按时间倒序排列的
+    return getDosageLevel(latestRecord.dosage);
+  }, [records]);
 
   const chartOption = useMemo(() => {
     if (simulationData.length === 0) return {};
@@ -225,13 +245,18 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-500">当前估算血药浓度</span>
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-400 rounded-full text-[10px] font-bold">
+            <button 
+              onClick={() => setShowNotice(true)}
+              className="flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-400 rounded-full text-[10px] font-bold hover:bg-red-100 transition-colors cursor-pointer"
+            >
               <Info className="w-3 h-3" /> 重要提示
+            </button>
+          </div>
+          {latestDosageLevel && (
+            <div className={cn("px-3 py-1 rounded-full text-xs font-bold", latestDosageLevel.color)}>
+              {latestDosageLevel.label}
             </div>
-          </div>
-          <div className="px-3 py-1 bg-orange-50 text-orange-400 rounded-full text-xs font-bold">
-            低于参考范围
-          </div>
+          )}
         </div>
         
         <div className="flex gap-12">
@@ -288,6 +313,58 @@ export default function Home() {
           />
         </div>
       </motion.div>
+
+      {/* 重要提示弹窗 */}
+      <AnimatePresence>
+        {showNotice && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100"
+              onClick={handleConfirmNotice}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[440px] bg-[#F2F2F2] rounded-[48px] p-10 shadow-2xl z-101 overflow-hidden"
+            >
+              <div className="flex flex-col items-center text-center space-y-6">
+                <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
+                  <AlertCircle className="w-8 h-8 text-red-400" />
+                </div>
+                
+                <h2 className="text-2xl font-black text-gray-900">重要提示</h2>
+                
+                <div className="space-y-4">
+                  <p className="text-gray-500 leading-relaxed font-medium">
+                    近期有用户反馈，参考血检结果进行校准后，估算数据出现异常偏差。
+                  </p>
+                  
+                  <div className="bg-white/60 border border-pink-100 rounded-[32px] p-6 text-left">
+                    <p className="text-gray-900 font-bold leading-relaxed">
+                      请务必理解：本软件仅依据药代动力学模型提供理论估算值，无法替代真实的血液检测。同一个个体在不同时期的吸收代谢情况也可能发生变化。
+                    </p>
+                  </div>
+                  
+                  <p className="text-gray-400 text-sm leading-relaxed px-2">
+                    要准确了解您的血药浓度，唯一的途径是前往医院进行血检。请始终以医院检查报告作为调整用药的依据，切勿仅依赖本软件的估算值。
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleConfirmNotice}
+                  className="w-full py-5 bg-[#4A9488] text-white rounded-[24px] font-bold text-lg hover:bg-[#3D7A70] transition-all active:scale-[0.98] shadow-lg shadow-[#4A9488]/20 mt-4"
+                >
+                  确定
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
