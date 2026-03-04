@@ -389,4 +389,25 @@ app.get('/hello', (c) => {
   })
 })
 
-export default app
+export default {
+  fetch: async (request: Request, env: Bindings, ctx: any) => {
+    const url = new URL(request.url)
+    
+    if (url.pathname.startsWith('/api')) {
+      return app.fetch(request, env, ctx)
+    }
+    
+    if (env.ASSETS) {
+      try {
+        const response = await env.ASSETS.fetch(request)
+        if (response.status !== 404) {
+          return response
+        }
+      } catch (e) {
+        console.error('ASSETS fetch error:', e)
+      }
+    }
+    
+    return new Response('Not Found', { status: 404 })
+  }
+}
