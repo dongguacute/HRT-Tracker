@@ -45,8 +45,9 @@ export function createCalibrationInterpolator(sim: SimulationResult | null, resu
     .map(r => {
       const obs = convertToPgMl(r.concValue, r.unit);
       const pred = interpolateConcentration(sim, r.timeH, 'concPGmL_E2');
-      if (pred === null || pred <= 0 || obs <= 0) return null;
-      return { timeH: r.timeH, ratio: Math.max(0.01, Math.min(2000, obs / pred)) };
+      if (pred === null || obs <= 0) return null;
+      const sanitizedPred = Math.max(pred, 0.01);
+      return { timeH: r.timeH, ratio: Math.max(0.01, Math.min(2000, obs / sanitizedPred)) };
     })
     .filter((p): p is { timeH: number; ratio: number } => !!p)
     .sort((a, b) => a.timeH - b.timeH);

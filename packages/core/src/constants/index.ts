@@ -40,9 +40,9 @@ export const GEL_SITE_PARAMS: Record<string, number> = {
 };
 
 export const SL_TIER_ORDER = ["quick", "casual", "standard", "strict"] as const;
-export const SL_TIER_PARAMS: Record<string, { theta: number }> = {
-  quick: { theta: 0.01 },
-  casual: { theta: 0.04 },
-  standard: { theta: 0.11 },
-  strict: { theta: 0.18 },
+export const SL_TIER_PARAMS: Record<string, { theta: number; hold: number }> = {
+  quick: { theta: 0.01, hold: 2 },
+  casual: { theta: 0.04, hold: 5 },
+  standard: { theta: 0.11, hold: 10 },
+  strict: { theta: 0.18, hold: 15 },
 };
