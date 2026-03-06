@@ -212,7 +212,7 @@ app.post('/auth/login', async (c) => {
   }
 
   if (user) {
-    const payload = { ...user, exp: Date.now() + 86400000 }
+    const payload = { ...user }
     const token = btoa(JSON.stringify({})) + '.' + btoa(JSON.stringify(payload)) + '.sig'
     
     // 自动判断是否为开发环境
@@ -222,7 +222,6 @@ app.post('/auth/login', async (c) => {
       httpOnly: true,
       secure: !isDev, // 开发环境(http)下设为 false，生产环境(https)下设为 true
       sameSite: 'Lax', // 改为 Lax 以提高 Safari 兼容性
-      maxAge: 86400,
       path: '/'
     })
     return c.json({ user })

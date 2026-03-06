@@ -14,11 +14,6 @@ export const authMiddleware = async (c: Context<any>, next: Next) => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1])) as UserPayload
     
-    // 检查 Token 是否过期
-    if (payload.exp && Date.now() > payload.exp) {
-      return c.json({ error: 'Token expired' }, 401)
-    }
-
     c.set('user', payload)
     await next()
   } catch (e) {
