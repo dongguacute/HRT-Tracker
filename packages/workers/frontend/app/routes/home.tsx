@@ -210,8 +210,8 @@ export default function Home() {
     return simulationResult.timeH.map((t: number, i: number) => ({
       time: t,
       displayTime: format(addDays(baseTime, t / 24), i18n.language.startsWith('zh') || i18n.language === 'ja' ? "M月d日 HH:mm" : "MMM d, HH:mm"),
-      e2: Math.round(finalConc_E2[i] || 0),
-      cpa: Math.round(simulationResult.concPGmL_CPA[i] || 0),
+      e2: finalConc_E2[i] || 0,
+      cpa: simulationResult.concPGmL_CPA[i] || 0,
     }));
   }, [simulationResult, labRecords, i18n.language]);
 
@@ -261,7 +261,7 @@ export default function Home() {
             <div style="margin-bottom: 4px; color: ${isDark ? '#9ca3af' : '#6b7280'}; font-size: 12px;">${data.name}</div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f472b6;"></div>
-              <span style="font-size: 14px; color: ${isDark ? '#e5e7eb' : '#374151'};">${t('home.estradiol')}: <span style="font-size: 18px; color: #f472b6; font-weight: 900;">${data.value}</span> <span style="font-size: 10px; color: ${isDark ? '#6b7280' : '#9ca3af'};">pg/mL</span></span>
+              <span style="font-size: 14px; color: ${isDark ? '#e5e7eb' : '#374151'};">${t('home.estradiol')}: <span style="font-size: 18px; color: #f472b6; font-weight: 900;">${Math.round(data.value)}</span> <span style="font-size: 10px; color: ${isDark ? '#6b7280' : '#9ca3af'};">pg/mL</span></span>
             </div>
           `;
         }
@@ -327,14 +327,17 @@ export default function Home() {
         {
           name: t('home.estradiol'),
           type: 'line',
-          smooth: true,
+          smooth: 0.6, // 增加平滑系数，0.6 是一个非常平滑的数值
           showSymbol: false,
           symbolSize: 8,
           data: simulationData.map((d: any) => d.e2),
           lineStyle: {
             width: 4,
-            color: '#f472b6'
+            color: '#f472b6',
+            cap: 'round',
+            join: 'round'
           },
+          sampling: 'lttb', // 使用 LTTB 算法进行下采样，在保持特征的同时让线条更平滑
           areaStyle: {
             color: {
               type: 'linear',
@@ -403,8 +406,14 @@ export default function Home() {
               <span className="text-sm font-bold text-gray-900 dark:text-white">{t('home.estradiol')}</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">{currentE2}</span>
+              <span className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white">{Math.round(currentE2)}</span>
               <span className="text-sm font-bold text-gray-400 dark:text-gray-500">pg/mL</span>
+              <div className="group relative ml-1 inline-flex items-center">
+                <Info className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 cursor-help" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-900 dark:bg-gray-800 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">
+                  {t('home.medical_rounding_notice', '数值已按医学标准取整显示。实际计算基于高精度模拟数据。')}
+                </div>
+              </div>
             </div>
             {labRecords.length > 0 && (
               <div className="mt-2 space-y-1">

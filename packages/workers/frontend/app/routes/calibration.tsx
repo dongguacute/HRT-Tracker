@@ -373,7 +373,21 @@ export default function CalibrationPage() {
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="font-bold text-gray-900 dark:text-white">{t('home.estradiol')} (E2)</h4>
                         <span className="text-sm text-gray-400 dark:text-gray-500 font-medium">
-                          {format(date, "yyyy-MM-dd HH:mm")}
+                          {(() => {
+                            const now = new Date();
+                            const isSameYear = date.getFullYear() === now.getFullYear();
+                            const isToday = isSameYear && 
+                                            date.getMonth() === now.getMonth() && 
+                                            date.getDate() === now.getDate();
+                            
+                            if (isToday) {
+                              return format(date, "HH:mm");
+                            } else if (isSameYear) {
+                              return format(date, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "M月d日 HH:mm" : "MMM d, HH:mm");
+                            } else {
+                              return format(date, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "yyyy年M月d日 HH:mm" : "MMM d, yyyy, HH:mm");
+                            }
+                          })()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">

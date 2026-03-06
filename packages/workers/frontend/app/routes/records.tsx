@@ -478,7 +478,21 @@ export default function RecordsPage() {
                           <h4 className="font-bold text-sm md:text-base text-gray-900 dark:text-white truncate">{type.label.split(' ')[0]} ({record.type})</h4>
                         </div>
                         <span className="text-xs text-gray-400 dark:text-gray-500 font-medium shrink-0">
-                          {format(date, "HH:mm")}
+                          {(() => {
+                            const now = new Date();
+                            const isSameYear = date.getFullYear() === now.getFullYear();
+                            const isToday = isSameYear && 
+                                            date.getMonth() === now.getMonth() && 
+                                            date.getDate() === now.getDate();
+                            
+                            if (isToday) {
+                              return format(date, "HH:mm");
+                            } else if (isSameYear) {
+                              return format(date, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "M月d日 HH:mm" : "MMM d, HH:mm");
+                            } else {
+                              return format(date, i18n.language.startsWith('zh') || i18n.language === 'ja' ? "yyyy年M月d日 HH:mm" : "MMM d, yyyy, HH:mm");
+                            }
+                          })()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
