@@ -1,5 +1,5 @@
 {
-  "name": "hrt-tracker-backend",
+  "name": "hrt-tracker",
   "main": "packages/workers/backend/src/index.tsx",
   "compatibility_date": "2025-08-03",
   "compatibility_flags": [
